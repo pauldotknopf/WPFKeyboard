@@ -21,7 +21,16 @@ public:
 	//Return TRUE if x64, false if not...
 	BOOL	Is64BitWindows();
 
-	
+	//////////////////////////////////////////////////////////////////////////
+	//Structs to handle all keys assigned to a VK
+	struct VK_STRUCT
+	{
+		USHORT nVK;
+		std::vector<int> aSC;
+		std::vector<wchar_t> aChar;
+	};
+
+	CKLL::VK_STRUCT* CKLL::GetVKAtIndex(BYTE index);
 private:
 	//Our loaded DLL
 	HMODULE hHandle;
@@ -37,15 +46,6 @@ private:
 	//64-bit variables
 	PKBDTABLES64 KbdTables64;
 	void Fill64();
-
-	//////////////////////////////////////////////////////////////////////////
-	//Structs to handle all keys assigned to a VK
-	struct VK_STRUCT
-	{
-		USHORT nVK;
-		std::vector<int> aSC;
-		std::vector<wchar_t> aChar;
-	};
 
 	//Variable to keep track of VKs
 	std::vector<VK_STRUCT*> m_vkarray;

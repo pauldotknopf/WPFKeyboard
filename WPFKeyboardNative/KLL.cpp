@@ -130,7 +130,6 @@ void CKLL::Fill32()
 
 void CKLL::Fill64()
 {
-	std::cout << "Fill64\n";
 	//If KbdTables64 aren't set, just silent return
 	if(!KbdTables64)
 		return;
@@ -182,8 +181,7 @@ void CKLL::AddVKChar( USHORT nVK, wchar_t wChar )
 
 void CKLL::AddVKSC( USHORT nVK, USHORT nSC )
 {
-	std ::cout << "My variable is " << nVK << "\n";
-
+	std::cout << "NSC: " << nSC << "\n";
 	//Check if the VK already exists, add SC if so
 	int iVKArray = this->VKExist(nVK);
 	if(iVKArray!=-1)
@@ -195,6 +193,7 @@ void CKLL::AddVKSC( USHORT nVK, USHORT nSC )
 
 	VK_STRUCT *pVK = new VK_STRUCT();
 	pVK->nVK = nVK;
+	pVK->aSC.insert(pVK->aSC.end(), nSC);
 	m_vkarray.insert(m_vkarray.end(), pVK);
 }
 
@@ -210,6 +209,11 @@ int CKLL::VKExist( USHORT nVK )
 
 	//Not found
 	return -1;
+}
+
+CKLL::VK_STRUCT* CKLL::GetVKAtIndex(BYTE index)
+{
+	return m_vkarray[index];
 }
 
 void CKLL::ClearVKChar()

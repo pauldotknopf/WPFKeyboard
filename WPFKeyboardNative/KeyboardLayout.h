@@ -11,6 +11,6 @@ namespace WPFKeyboardNative
 	public:
 		KeyboardLayout(String^ keyboardLayoutDllPath);
 		property List<VirtualKey^>^ VirtualKeys { List<VirtualKey^>^ get (); };
-		void AddVirtualKey(int virtualKey);
+		void AddVirtualKey(int virtualKey, array<unsigned int>^ scanCodes, array<String^>^ characters);
 	};
 }
