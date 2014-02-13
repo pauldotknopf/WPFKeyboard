@@ -26,6 +26,7 @@ public:
 	struct VK_STRUCT
 	{
 		USHORT nVK;
+		BYTE attributes;
 		std::vector<int> aSC;
 		std::vector<wchar_t> aChar;
 	};
@@ -50,8 +51,5 @@ private:
 	//Variable to keep track of VKs
 	std::vector<VK_STRUCT*> m_vkarray;
 
-	void AddVKChar(USHORT nVK, wchar_t wChar);
-	void AddVKSC(USHORT nVK, USHORT nSC);
-	int VKExist(USHORT nVK);
 	void ClearVKChar();	
 };

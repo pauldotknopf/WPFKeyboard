@@ -43,7 +43,7 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 			characters[y] = gcnew String(vk->aChar[y], 1);
 		}
 
-		layout->AddVirtualKey(i, scanCodes, characters);
+		layout->VirtualKeys->Add(gcnew VirtualKey(vk->nVK, vk->attributes, characters));
 	}
 
 	return layout;

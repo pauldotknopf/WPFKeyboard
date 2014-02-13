@@ -33,13 +33,19 @@
     <ClInclude Include="kbd64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VirtualKey.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KeyboardLayoutHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualKeyToCharacters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScanCodeToVirtualKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CharModifiers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,13 +62,19 @@
     <ClCompile Include="KLL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VirtualKey.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KeyboardLayoutHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualKeyToCharacters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScanCodeToVirtualKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CharModifiers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

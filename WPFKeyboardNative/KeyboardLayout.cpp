@@ -11,8 +11,3 @@ List<WPFKeyboardNative::VirtualKey^>^ WPFKeyboardNative::KeyboardLayout::Virtual
 {
 	return _virtualkeys;
 }
-
-void WPFKeyboardNative::KeyboardLayout::AddVirtualKey(int virtualKey, array<unsigned int>^ scanCodes, array<String^>^ characters)
-{
-	_virtualkeys->Add(gcnew VirtualKey(virtualKey, scanCodes, characters));
-}

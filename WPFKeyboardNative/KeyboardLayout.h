@@ -1,5 +1,5 @@
 #pragma once
-#include "VirtualKey.h"
+#include "VirtualKeyToCharacters.h"
 using namespace System;
 using namespace System::Collections::Generic;
 namespace WPFKeyboardNative 
@@ -7,10 +7,9 @@ namespace WPFKeyboardNative
 	public ref class KeyboardLayout
 	{
 	private:
-		List<VirtualKey^>^ _virtualkeys;
+		List<VirtualKeyToCharacters^>^ _virtualkeys;
 	public:
 		KeyboardLayout(String^ keyboardLayoutDllPath);
-		property List<VirtualKey^>^ VirtualKeys { List<VirtualKey^>^ get (); };
-		void AddVirtualKey(int virtualKey, array<unsigned int>^ scanCodes, array<String^>^ characters);
+		property List<VirtualKeyToCharacters^>^ VirtualKeysToCharacters { List<VirtualKeyToCharacters^>^ get (); };
 	};
 }

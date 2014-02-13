@@ -2,16 +2,16 @@
 using namespace System;
 namespace WPFKeyboardNative 
 {
-	public ref class VirtualKey
+	public ref class VirtualKeyToCharacters
 	{
 	private:
 		int _virtualkey;
-		array<unsigned int>^ _scanCodes; 
+		int _attributes;
 		array<String^>^ _characters;
 	public:
-		VirtualKey(int virtualKey, array<unsigned int>^ scanCodes, array<String^>^ characters);
+		VirtualKeyToCharacters(int virtualKey, int attributes, array<String^>^ characters);
 		property int Key { int get (); }
-		property array<unsigned int>^ ScanCodes { array<unsigned int>^ get (); }
 		property array<String^>^ Characters { array<String^>^ get (); }
+		property int Attributes { int get (); }
 	};
 }

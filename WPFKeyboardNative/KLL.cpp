@@ -134,10 +134,6 @@ void CKLL::Fill64()
 	if(!KbdTables64)
 		return;
 
-	//Fill all the SC into VKs array
-	for (int i = 0; i < KbdTables64->bMaxVSCtoVK; i++)
-		this->AddVKSC(KbdTables64->pusVSCtoVK[i], i);
-
 	//Handle all the chars with modifieres
 	PVK_TO_WCHAR_TABLE64 pVkToWchTbl = KbdTables64->pVkToWcharTable;
 	while (pVkToWchTbl->pVkToWchars)
@@ -145,10 +141,15 @@ void CKLL::Fill64()
 		PVK_TO_WCHARS641 pVkToWch = pVkToWchTbl->pVkToWchars;
 		while (pVkToWch->VirtualKey)
 		{
+			VK_STRUCT *pVK = new VK_STRUCT();
+			pVK->nVK = pVkToWch->VirtualKey;
+			pVK->attributes = pVkToWch->Attributes;
+
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
-				this->AddVKChar(pVkToWch->VirtualKey, pVkToWch->wch[i]);
+				pVK->aChar.insert(pVK->aChar.end(), pVkToWch->wch[i]);
 			}
+			m_vkarray.insert(m_vkarray.end(), pVK);
 
 			pVkToWch = (PVK_TO_WCHARS641)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
 		}
@@ -159,56 +160,6 @@ void CKLL::Fill64()
 USHORT CKLL::GetVKCount()
 {
 	return m_vkarray.size();
-}
-
-void CKLL::AddVKChar( USHORT nVK, wchar_t wChar )
-{
-	//Check if the VK already exists, add char if so
-	int iVKArray = this->VKExist(nVK);
-	if(iVKArray!=-1)
-	{
-		VK_STRUCT *pVK = ((VK_STRUCT *)m_vkarray[iVKArray]);
-		pVK->aChar.insert(pVK->aChar.end(), wChar);
-		return;
-	}
-
-	//Create a new item and store into the array
-	VK_STRUCT *pVK = new VK_STRUCT();
-	pVK->nVK = nVK;
-	pVK->aChar.insert(pVK->aChar.end(), wChar);
-	m_vkarray.insert(m_vkarray.end(), pVK);
-}
-
-void CKLL::AddVKSC( USHORT nVK, USHORT nSC )
-{
-	std::cout << "NSC: " << nSC << "\n";
-	//Check if the VK already exists, add SC if so
-	int iVKArray = this->VKExist(nVK);
-	if(iVKArray!=-1)
-	{
-		VK_STRUCT *pVK = ((VK_STRUCT *)m_vkarray[iVKArray]);
-		pVK->aSC.insert(pVK->aSC.end(), nSC);
-		return;
-	}
-
-	VK_STRUCT *pVK = new VK_STRUCT();
-	pVK->nVK = nVK;
-	pVK->aSC.insert(pVK->aSC.end(), nSC);
-	m_vkarray.insert(m_vkarray.end(), pVK);
-}
-
-int CKLL::VKExist( USHORT nVK )
-{
-	//Check if the VK already exists, add char if so
-	for(INT_PTR i = 0;i<m_vkarray.size();i++)
-	{
-		VK_STRUCT *pVK = (VK_STRUCT*)m_vkarray[i];
-		if(pVK->nVK == nVK)
-			return i;
-	}
-
-	//Not found
-	return -1;
 }
 
 CKLL::VK_STRUCT* CKLL::GetVKAtIndex(BYTE index)
@@ -225,7 +176,6 @@ void CKLL::ClearVKChar()
 	}
 	m_vkarray.clear();
 }
-
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 BOOL CKLL::Is64BitWindows()
