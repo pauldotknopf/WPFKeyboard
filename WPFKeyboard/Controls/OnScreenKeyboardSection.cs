@@ -12,10 +12,12 @@ namespace WPFKeyboard.Controls
 {
     public class OnScreenKeyboardSection : Grid
     {
+        readonly OnScreenKeyboard _onScreenKeyboard;
         OnScreenKeyboardSectionViewModel _viewModel;
 
-        public OnScreenKeyboardSection()
+        public OnScreenKeyboardSection(OnScreenKeyboard onScreenKeyboard)
         {
+            _onScreenKeyboard = onScreenKeyboard;
             DataContextChanged += OnDataContextChanged;
         }
 
@@ -56,7 +58,7 @@ namespace WPFKeyboard.Controls
             // add enough row controls to match the number of row view models we have
             while (Children.Count < _viewModel.Rows.Count)
             {
-                Children.Add(new OnScreenKeyboardRow());
+                Children.Add(new OnScreenKeyboardRow(_onScreenKeyboard));
                 RowDefinitions.Add(new RowDefinition());
             }
 
