@@ -31,6 +31,12 @@
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -76,30 +82,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Headers\kbd.h" />
+    <ClInclude Include="..\Headers\kbd64.h" />
+    <ClInclude Include="..\Headers\KLL.h" />
     <ClInclude Include="CharModifiers.h" />
-    <ClInclude Include="kbd.h" />
-    <ClInclude Include="kbd64.h" />
     <ClInclude Include="KeyboardLayout.h" />
     <ClInclude Include="KeyboardLayoutHelper.h" />
-    <ClInclude Include="KLL.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="ScanCodeToVirtualKey.h" />
     <ClInclude Include="Stdafx.h" />
-    <ClInclude Include="VirtualKeyToCharacters.h" />
     <ClInclude Include="WPFKeyboardNative.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Headers\KLL.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CharModifiers.cpp" />
     <ClCompile Include="KeyboardLayout.cpp" />
     <ClCompile Include="KeyboardLayoutHelper.cpp" />
-    <ClCompile Include="KLL.cpp" />
-    <ClCompile Include="ScanCodeToVirtualKey.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="VirtualKeyToCharacters.cpp" />
     <ClCompile Include="WPFKeyboardNative.cpp" />
   </ItemGroup>
   <ItemGroup>

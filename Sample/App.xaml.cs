@@ -12,5 +12,14 @@ namespace Sample
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            Startup += OnStartup;
+        }
+
+        private void OnStartup(object sender, StartupEventArgs startupEventArgs)
+        {
+            WPFKeyboardNative.KeyboardLayoutHelper.GetLayout(@"C:\Windows\SysWOW64\KBDUSA.DLL");
+        }
     }
 }

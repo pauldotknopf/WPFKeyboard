@@ -4,10 +4,11 @@
 
 WPFKeyboardNative::KeyboardLayout::KeyboardLayout(String^ keyboardLayoutDllPath)
 {
-	_virtualkeys = gcnew List<WPFKeyboardNative::VirtualKey^>();
+	//_virtualkeys = gcnew List<WPFKeyboardNative::VirtualKey^>();
 }
 
-List<WPFKeyboardNative::VirtualKey^>^ WPFKeyboardNative::KeyboardLayout::VirtualKeys::get() 
-{
-	return _virtualkeys;
-}
+//List<WPFKeyboardNative::VirtualKeyToCharacters^>^ WPFKeyboardNative::KeyboardLayout::VirtualKeysToCharacters::get() 
+//{
+//	return nullptr;
+//	//return _virtualkeys;
+//}
