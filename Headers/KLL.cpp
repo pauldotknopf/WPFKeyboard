@@ -14,6 +14,8 @@ CKLL::CKLL(void)
 CKLL::~CKLL(void)
 {
 	this->ClearVKChar();
+	this->ClearVKModifiers();
+	this->ClearVKScanCodes();
 	this->UnloadDLL();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -63,8 +65,9 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
-		//Clear, then fill the array
 		this->ClearVKChar();
+		this->ClearVKModifiers();
+		this->ClearVKScanCodes();
 		this->Fill32();
 	}
 	else //64-bit
@@ -79,8 +82,9 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
-		//Clear, then fill the array
 		this->ClearVKChar();
+		this->ClearVKModifiers();
+		this->ClearVKScanCodes();
 		this->Fill64();
 	}
 
@@ -109,16 +113,16 @@ void CKLL::Fill32()
 	if(!KbdTables)
 		return;
 
-	/*
-     * Modifier keys
-     */
-    PMODIFIERS pCharModifiers = KbdTables->pCharModifiers;
-	PVK_TO_BIT pVkToBit = pCharModifiers->pVkToBit;
-	while (pVkToBit->Vk)
-    {
-		std::cout << "VkToBit " << pVkToBit->Vk << " -> " << pVkToBit->ModBits << "\n";
-        ++pVkToBit;
-    }
+	///*
+	//* Modifier keys
+	//*/
+	//PMODIFIERS pCharModifiers = KbdTables->pCharModifiers;
+	//PVK_TO_BIT pVkToBit = pCharModifiers->pVkToBit;
+	//while (pVkToBit->Vk)
+	//{
+	//	std::cout << "VkToBit " << pVkToBit->Vk << " -> " << pVkToBit->ModBits << "\n";
+	//	++pVkToBit;
+	//}
 
 	////Handle all the chars with modifieres
 	//PVK_TO_WCHAR_TABLE pVkToWchTbl = KbdTables->pVkToWcharTable;
@@ -171,37 +175,37 @@ void CKLL::Fill32()
 
 void CKLL::Fill64()
 {
-	std::cout << "64bit\n";
-
-	//If KbdTables64 aren't set, just silent return
+	// if KbdTables64 aren't set, just silent return
 	if(!KbdTables64)
 		return;
 
-	/*
-     * Modifier keys
-     */
-    PMODIFIERS pCharModifiers = KbdTables->pCharModifiers;
-	PVK_TO_BIT pVkToBit = pCharModifiers->pVkToBit;
+	// modifier keys
+	PMODIFIERS64 pCharModifiers = KbdTables64->pCharMODIFIERS64;
+	PVK_TO_BIT64 pVkToBit = pCharModifiers->pVkToBit;
 	while (pVkToBit->Vk)
-    {
-		std::cout << "VkToBit " << pVkToBit->Vk << " -> " << pVkToBit->ModBits << "\n";
-        ++pVkToBit;
-    }
+	{
+		VK_MODIFIER *modifier = new VK_MODIFIER();
+		modifier->VirtualKey = pVkToBit->Vk;
+		modifier->ModifierBits = pVkToBit->ModBits;
+		m_vkModifiersArray.insert(m_vkModifiersArray.end(), modifier);
+		++pVkToBit;
+	}
 
-	//Handle all the chars with modifieres
+	// virtual keys to chars with modifieres
 	PVK_TO_WCHAR_TABLE64 pVkToWchTbl = KbdTables64->pVkToWcharTable;
 	while (pVkToWchTbl->pVkToWchars)
 	{
 		PVK_TO_WCHARS641 pVkToWch = pVkToWchTbl->pVkToWchars;
 		while (pVkToWch->VirtualKey)
 		{
+			printf("Virtual Key: %d\n", pVkToWch->VirtualKey);
 			VK_STRUCT *pVK = new VK_STRUCT();
 			pVK->nVK = pVkToWch->VirtualKey;
 			pVK->attributes = pVkToWch->Attributes;
 
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
-				pVK->aChar.insert(pVK->aChar.end(), pVkToWch->wch[i]);
+				pVK->characters.insert(pVK->characters.end(), pVkToWch->wch[i]);
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);
 
@@ -209,6 +213,22 @@ void CKLL::Fill64()
 		}
 		++pVkToWchTbl;
 	}
+
+	// virtual key scan codes
+	for(int i = 0; i < KbdTables64->bMaxVSCtoVK; i++ ) {
+
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->nVK = KbdTables64->pusVSCtoVK[i];
+		scanCode->scanCode = i;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+	}
+
+	///*PDEADKEY64 pDEADKEY64 = KbdTables64->pDEADKEY64;
+	//int count = 0;
+	//while(pDEADKEY64){
+	//count++;
+	//pDEADKEY64++;
+	//}*/
 }
 
 USHORT CKLL::GetVKCount()
@@ -229,6 +249,47 @@ void CKLL::ClearVKChar()
 		delete pVK;
 	}
 	m_vkarray.clear();
+}
+
+USHORT CKLL::GetModifiersCount()
+{
+	return m_vkModifiersArray.size();
+}
+
+CKLL::VK_MODIFIER* CKLL::GetModifierAtIndex(BYTE index)
+{
+	return m_vkModifiersArray[index];
+}
+
+void CKLL::ClearVKModifiers()
+{
+	for(int i = 0;i<m_vkModifiersArray.size();i++)
+	{
+		VK_MODIFIER *pVK = m_vkModifiersArray[i];
+		delete pVK;
+	}
+	m_vkModifiersArray.clear();
+}
+
+
+USHORT CKLL::GetScanCodesCount()
+{
+	return m_vkScanCodesArray.size();
+}
+
+CKLL::VK_SCANCODE* CKLL::GetScanCodeAtIndex(BYTE index)
+{
+	return m_vkScanCodesArray[index];
+}
+
+void CKLL::ClearVKScanCodes()
+{
+	for(int i = 0;i<m_vkScanCodesArray.size();i++)
+	{
+		VK_SCANCODE *pVK = m_vkScanCodesArray[i];
+		delete pVK;
+	}
+	m_vkScanCodesArray.clear();
 }
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);

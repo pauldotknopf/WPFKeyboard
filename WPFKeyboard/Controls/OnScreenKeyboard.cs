@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Windows.Navigation;
+using System.Windows.Data;
 using WPFKeyboard.Models;
-using Application = System.Windows.Application;
-using Binding = System.Windows.Data.Binding;
 
 namespace WPFKeyboard.Controls
 {
@@ -38,6 +32,35 @@ namespace WPFKeyboard.Controls
         {
             get { return (Style)GetValue(OnScreenKeyStyleProperty); }
             set { SetValue(OnScreenKeyStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// See OnScreenKeyControlBuilder
+        /// </summary>
+        public static readonly DependencyProperty OnScreenKeyControlBuilderProperty =
+            DependencyProperty.Register("OnScreenKeyControlBuilder", typeof(IOnScreenKeyControlBuilder), typeof(OnScreenKeyboard), new PropertyMetadata(new DefaultOnScreenKeyControlBuilder(), OnScreenKeyControlBuilderPropertyChangedCallback), OnScreenKeyControlBuilderValidateValueCallback);
+
+        private static void OnScreenKeyControlBuilderPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            var keyboard = (OnScreenKeyboard) dependencyObject;
+            keyboard.RefreshKeyContentControls();
+        }
+
+        private static bool OnScreenKeyControlBuilderValidateValueCallback(object value)
+        {
+            if (value == null)
+                return false;
+
+            return value is IOnScreenKeyControlBuilder;
+        }
+
+        /// <summary>
+        /// The control builder that is used to 
+        /// </summary>
+        public IOnScreenKeyControlBuilder OnScreenKeyControlBuilder
+        {
+            get { return (IOnScreenKeyControlBuilder) GetValue(OnScreenKeyControlBuilderProperty); }
+            set { SetValue(OnScreenKeyControlBuilderProperty, value); }
         }
 
         #endregion
@@ -113,7 +136,7 @@ namespace WPFKeyboard.Controls
             Keyboard.KeyUp -= OnKeyUp;
         }
 
-        private void OnKeyUp(object sender, KeyEventArgs args)
+        private void OnKeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
         {
             foreach (var section in _viewModel.Sections)
             {
@@ -128,7 +151,7 @@ namespace WPFKeyboard.Controls
             }
         }
 
-        private void OnKeyPress(object sender, KeyPressEventArgs args)
+        private void OnKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs args)
         {
             foreach (var section in _viewModel.Sections)
             {
@@ -143,7 +166,7 @@ namespace WPFKeyboard.Controls
             }
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs args)
+        private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
         {
             foreach (var section in _viewModel.Sections)
             {
@@ -159,5 +182,33 @@ namespace WPFKeyboard.Controls
         }
 
         #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Calling this method will rebuild the controls for every key
+        /// </summary>
+        private void RefreshKeyContentControls()
+        {
+            var controlBuilder = OnScreenKeyControlBuilder;
+            foreach (OnScreenKeyboardSection section in Children)
+                foreach (OnScreenKeyboardRow row in section.Children)
+                    foreach (OnScreenKey key in row.Children)
+                        key.Content = controlBuilder.BuildControlForKey(key.ViewModel);
+        }
+
+        /// <summary>
+        /// Build the control that is to be used for the given key view model
+        /// </summary>
+        /// <param name="keyViewModel">The key view model.</param>
+        /// <returns></returns>
+        public object BuildContentControlForKey(BaseOnScreenKeyViewModel keyViewModel)
+        {
+            return OnScreenKeyControlBuilder.BuildControlForKey(keyViewModel);
+        }
+
+        #endregion
+
+        
     }
 }

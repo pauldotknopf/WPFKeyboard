@@ -53,10 +53,14 @@
     <Compile Include="Controls\OnScreenKey.cs" />
     <Compile Include="Controls\OnScreenKeyboardSection.cs" />
     <Compile Include="Controls\OnScreenKeyboardRow.cs" />
+    <Compile Include="DefaultOnScreenKeyControlBuilder.cs" />
+    <Compile Include="IOnScreenKeyControlBuilder.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IButtonEventListener.cs" />
     <Compile Include="IKeyEventListener.cs" />
     <Compile Include="Keyboard.cs" />
+    <Compile Include="Keyboards\KPDOnScreenKeyboardViewModel.cs" />
+    <Compile Include="Models\EmptyKeyViewModel.cs" />
     <Compile Include="Models\ModifierKey.cs" />
     <Compile Include="Models\OnScreenKeyboardViewModel.cs" />
     <Compile Include="BaseViewModel.cs" />
@@ -67,6 +71,12 @@
     <Compile Include="Models\VirtualKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\OnScreenKeyboard.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WPFKeyboardNative\WPFKeyboardNative.vcxproj">
+      <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
+      <Name>WPFKeyboardNative</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

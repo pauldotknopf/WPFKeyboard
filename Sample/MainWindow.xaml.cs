@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Sample.ViewModels;
+using WPFKeyboard.Keyboards;
 
 namespace Sample
 {
@@ -23,7 +24,7 @@ namespace Sample
         public MainWindow()
         {
             InitializeComponent();
-            VirtualKeyboard.DataContext = new SampleKeyboardViewModel();
+            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(@"C:\Windows\SysWOW64\KBDUSA.DLL");
         }
     }
 }

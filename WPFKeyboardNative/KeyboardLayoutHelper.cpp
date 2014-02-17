@@ -8,43 +8,52 @@ WPFKeyboardNative::KeyboardLayoutHelper::KeyboardLayoutHelper(void)
 
 WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetLayout(System::String^ keyboardLayoutDll)
 {
-	CKLL *kll = new CKLL();
+	CKLL *kll = nullptr;
+	try{
 
-	System::IntPtr p = System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(keyboardLayoutDll);
-	char *charKeyboardLayoutDll = static_cast<char*>(p.ToPointer());
-	bool result = kll->LoadDLL(charKeyboardLayoutDll);
-	System::Runtime::InteropServices::Marshal::FreeHGlobal(p);
+		kll = new CKLL();
 
-	int count = kll->GetVKCount();
+		System::IntPtr p = System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(keyboardLayoutDll);
+		char *charKeyboardLayoutDll = static_cast<char*>(p.ToPointer());
+		bool result = kll->LoadDLL(charKeyboardLayoutDll);
+		System::Runtime::InteropServices::Marshal::FreeHGlobal(p);
 
-	if(!result)
-		throw gcnew Exception(String::Format("Unabled to load keyboard layout dll {0}.", keyboardLayoutDll));
+		if(!result)
+			throw gcnew Exception(String::Format("Unabled to load keyboard layout dll {0}.", keyboardLayoutDll));
 
-	KeyboardLayout^ layout = gcnew KeyboardLayout(keyboardLayoutDll);
+		KeyboardLayout^ layout = gcnew KeyboardLayout(keyboardLayoutDll);
 
-	////Loop through each VK and show the ScanCode (SC) and chars attached to that VK
-	//for(BYTE i=0;i < kll->GetVKCount(); i++)
-	//{
-	//	CKLL::VK_STRUCT *vk = kll->GetVKAtIndex(i);
+		for(int i=0;i < kll->GetModifiersCount(); i++)
+		{
+			layout->CharModifiers->Add(gcnew CharModifier(kll->GetModifierAtIndex(i)->VirtualKey, kll->GetModifierAtIndex(i)->ModifierBits));
+		}
 
-	//	array<unsigned int>^ scanCodes = gcnew array<unsigned int>(vk->aSC.size());
+		for(BYTE i=0;i < kll->GetVKCount(); i++)
+		{
+			CKLL::VK_STRUCT *vk = kll->GetVKAtIndex(i);
 
-	//	int size = vk->aSC.size();
+			array<String^>^ characters = gcnew array<String^>(vk->characters.size());
 
-	//	for(int y = 0; y <vk->aSC.size(); y++)
-	//	{
-	//		scanCodes[y] = (vk->aSC[y]);
-	//	}
+			for(int y = 0; y <vk->characters.size(); y++)
+			{
+				characters[y] = gcnew String(vk->characters[y], 1);
+			}
 
-	//	array<String^>^ characters = gcnew array<String^>(vk->aChar.size());
+			layout->VirtualKeys->Add(gcnew VirtualKey(vk->nVK, vk->attributes, characters));
+		}
 
-	//	for(int y = 0; y <vk->aChar.size(); y++)
-	//	{
-	//		characters[y] = gcnew String(vk->aChar[y], 1);
-	//	}
+		for(BYTE i=0;i < kll->GetScanCodesCount(); i++)
+		{
+			layout->ScanCodes->Add(gcnew ScanCode(kll->GetScanCodeAtIndex(i)->nVK, kll->GetScanCodeAtIndex(i)->scanCode));
+		}
 
-	//	layout->VirtualKeys->Add(gcnew VirtualKey(vk->nVK, vk->attributes, characters));
-	//}
+		return layout;
+	} finally {
+		if(kll != nullptr)
+		{
+			delete kll;
+			kll = nullptr;
+		}
+	}
 
-	return layout;
 }

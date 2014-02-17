@@ -1,7 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using WPFKeyboard.Models;
 
 namespace WPFKeyboard.Controls
 {
@@ -18,8 +20,8 @@ namespace WPFKeyboard.Controls
         public OnScreenKey(OnScreenKeyboard onScreenKeyboard)
         {
             _onScreenKeyboard = onScreenKeyboard;
+            DataContextChanged += OnDataContextChanged;
             Focusable = false;
-            SetBinding(ContentProperty, new Binding("Content"));
             SetBinding(IsActiveProperty, new Binding("IsActive"));
             SetBinding(StyleProperty, new Binding("OnScreenKeyStyle") { Source = _onScreenKeyboard });
             PreviewMouseDown += OnMouseDown;
@@ -42,6 +44,11 @@ namespace WPFKeyboard.Controls
             get { return (bool)GetValue(IsActiveProperty); }
             set { SetValue(IsActiveProperty, value); }
         }
+
+        /// <summary>
+        /// The key view model for this control
+        /// </summary>
+        public BaseOnScreenKeyViewModel ViewModel { get { return DataContext as BaseOnScreenKeyViewModel; } }
 
         #endregion
 
@@ -69,6 +76,23 @@ namespace WPFKeyboard.Controls
             var buttonEvent = DataContext as IButtonEventListener;
             if (buttonEvent != null)
                 buttonEvent.ButtonDown();
+        }
+
+        /// <summary>
+        /// This is raised when the data context changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                Content = _onScreenKeyboard.BuildContentControlForKey(ViewModel);
+            }
+            else
+            {
+                Content = null;
+            }
         }
 
         #endregion

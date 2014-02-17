@@ -22,8 +22,6 @@ namespace WPFKeyboard.Models
             _normal = normal;
             _modified = modified;
             Display = _normal;
-
-            BuildTextContent();
         }
 
         #region IKeyEventListener

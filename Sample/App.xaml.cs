@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace Sample
@@ -10,7 +11,7 @@ namespace Sample
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
@@ -19,7 +20,7 @@ namespace Sample
 
         private void OnStartup(object sender, StartupEventArgs startupEventArgs)
         {
-            WPFKeyboardNative.KeyboardLayoutHelper.GetLayout(@"C:\Windows\SysWOW64\KBDUSA.DLL");
+           
         }
     }
 }

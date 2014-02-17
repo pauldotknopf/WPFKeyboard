@@ -64,9 +64,9 @@ namespace WPFKeyboard.Controls
             foreach (var key in _viewModel.Keys)
             {
                 var index = _viewModel.Keys.IndexOf(key);
-                var keyboardSectionRow = ((OnScreenKey)Children[index]);
-                keyboardSectionRow.DataContext = key;
-                SetColumn(keyboardSectionRow, index);
+                var control = ((OnScreenKey)Children[index]);
+                control.DataContext = key;
+                SetColumn(control, index);
                 ColumnDefinitions[index].SetBinding(ColumnDefinition.WidthProperty, new Binding("ButtonWidth") { Source = key });
             }
         }

@@ -41,22 +41,5 @@ namespace WPFKeyboard.Models
                 RaisePropertyChanged("IsActive");
             }
         }
-
-        public object Content
-        {
-            get { return _content; }
-            set
-            {
-                _content = value;
-                RaisePropertyChanged("Content");
-            }
-        }
-
-        protected void BuildTextContent()
-        {
-            var textBlock = new TextBlock();
-            textBlock.SetBinding(TextBlock.TextProperty, new Binding("Display"));
-            Content = textBlock;
-        }
     }
 }

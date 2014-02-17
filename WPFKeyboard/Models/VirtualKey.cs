@@ -15,7 +15,6 @@ namespace WPFKeyboard.Models
         {
             _virtualKey = virtualKey;
             Display = "Esc";
-            BuildTextContent();
         }
 
         public void ButtonDown()
