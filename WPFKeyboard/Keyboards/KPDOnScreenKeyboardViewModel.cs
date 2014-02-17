@@ -31,6 +31,7 @@ namespace WPFKeyboard.Keyboards
         /// <param name="keyboardLayout">The keyboard layout.</param>
         public void BuildKeyboardLayout(KeyboardLayout keyboardLayout)
         {
+
             var mainSection = new OnScreenKeyboardSectionViewModel();
             mainSection.Rows.Add(BuildRow1(keyboardLayout));
             mainSection.Rows.Add(BuildRow2(keyboardLayout));
@@ -43,40 +44,40 @@ namespace WPFKeyboard.Keyboards
         private OnScreenKeyboardRowViewModel BuildRow1(KeyboardLayout layout)
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x29, layout));
-            row.Keys.Add(KeyForScanCode(0x02, layout));
-            row.Keys.Add(KeyForScanCode(0x03, layout));
-            row.Keys.Add(KeyForScanCode(0x04, layout));
-            row.Keys.Add(KeyForScanCode(0x05, layout));
-            row.Keys.Add(KeyForScanCode(0x06, layout));
-            row.Keys.Add(KeyForScanCode(0x07, layout));
-            row.Keys.Add(KeyForScanCode(0x08, layout));
-            row.Keys.Add(KeyForScanCode(0x09, layout));
-            row.Keys.Add(KeyForScanCode(0x0A, layout));
-            row.Keys.Add(KeyForScanCode(0x0B, layout));
-            row.Keys.Add(KeyForScanCode(0x0C, layout));
-            row.Keys.Add(KeyForScanCode(0x0D, layout));
-            row.Keys.Add(KeyForScanCode(0x0E, layout, 20));
+            row.Keys.Add(KeyForScanCode(0x29, layout));     
+            row.Keys.Add(KeyForScanCode(0x02, layout));     // 1
+            row.Keys.Add(KeyForScanCode(0x03, layout));     // 2
+            row.Keys.Add(KeyForScanCode(0x04, layout));     // 3
+            row.Keys.Add(KeyForScanCode(0x05, layout));     // 4
+            row.Keys.Add(KeyForScanCode(0x06, layout));     // 5
+            row.Keys.Add(KeyForScanCode(0x07, layout));     // 6
+            row.Keys.Add(KeyForScanCode(0x08, layout));     // 7
+            row.Keys.Add(KeyForScanCode(0x09, layout));     // 8
+            row.Keys.Add(KeyForScanCode(0x0A, layout));     // 9
+            row.Keys.Add(KeyForScanCode(0x0B, layout));     // 0
+            row.Keys.Add(KeyForScanCode(0x0C, layout));     // OEM_MINUS
+            row.Keys.Add(KeyForScanCode(0x0D, layout));     // OEM_PLUS
+            row.Keys.Add(KeyForScanCode(0x0E, layout, 20)); // BACK
             return row;
         }
 
         private OnScreenKeyboardRowViewModel BuildRow2(KeyboardLayout layout)
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x0F, layout, 15));
-            row.Keys.Add(KeyForScanCode(0x10, layout));
-            row.Keys.Add(KeyForScanCode(0x11, layout));
-            row.Keys.Add(KeyForScanCode(0x12, layout));
-            row.Keys.Add(KeyForScanCode(0x13, layout));
-            row.Keys.Add(KeyForScanCode(0x14, layout));
-            row.Keys.Add(KeyForScanCode(0x15, layout));
-            row.Keys.Add(KeyForScanCode(0x16, layout));
-            row.Keys.Add(KeyForScanCode(0x17, layout));
-            row.Keys.Add(KeyForScanCode(0x18, layout));
-            row.Keys.Add(KeyForScanCode(0x19, layout));
-            row.Keys.Add(KeyForScanCode(0x1A, layout));
-            row.Keys.Add(KeyForScanCode(0x1B, layout));
-            row.Keys.Add(KeyForScanCode(0x2B, layout, 15));
+            row.Keys.Add(KeyForScanCode(0x0F, layout, 15)); // TAB
+            row.Keys.Add(KeyForScanCode(0x10, layout));     // Q
+            row.Keys.Add(KeyForScanCode(0x11, layout));     // W
+            row.Keys.Add(KeyForScanCode(0x12, layout));     // E
+            row.Keys.Add(KeyForScanCode(0x13, layout));     // R
+            row.Keys.Add(KeyForScanCode(0x14, layout));     // T
+            row.Keys.Add(KeyForScanCode(0x15, layout));     // Y
+            row.Keys.Add(KeyForScanCode(0x16, layout));     // U
+            row.Keys.Add(KeyForScanCode(0x17, layout));     // I
+            row.Keys.Add(KeyForScanCode(0x18, layout));     // O
+            row.Keys.Add(KeyForScanCode(0x19, layout));     // P
+            row.Keys.Add(KeyForScanCode(0x1A, layout));     // [
+            row.Keys.Add(KeyForScanCode(0x1B, layout));     // ]
+            row.Keys.Add(KeyForScanCode(0x2B, layout, 15)); // \
             return row;
         }
 
@@ -137,7 +138,13 @@ namespace WPFKeyboard.Keyboards
 
         private BaseOnScreenKeyViewModel KeyForScanCode(int scanCode, KeyboardLayout layout, int widthWeight = 10)
         {
-            var t = layout.ScanCodes.Where(x => x.VirtualKey == 91).FirstOrDefault();
+            var t = layout.ScanCodes.Where(x => x.VirtualKey == 16).FirstOrDefault();
+            var t2 = layout.ScanCodes.Where(x => x.VirtualKey == 17).FirstOrDefault();
+            var t3 = layout.ScanCodes.Where(x => x.VirtualKey == 18).FirstOrDefault();
+
+            var vk1 = layout.VirtualKeys.SingleOrDefault(x => x.Key == 16);
+            var vk2 = layout.VirtualKeys.SingleOrDefault(x => x.Key == 17);
+            var vk3 = layout.VirtualKeys.SingleOrDefault(x => x.Key == 18);
 
             var sc = layout.ScanCodes.SingleOrDefault(x => x.Code == scanCode);
 

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{F12F830F-6B12-4D83-925B-01B2ABE37D8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFKeyboard", "WPFKeyboard\WPFKeyboard.csproj", "{1B56A2AB-181D-4C58-9230-BF3F286A5D35}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EC8EB985-A262-4DC3-8D3E-AE38786C8B7D} = {EC8EB985-A262-4DC3-8D3E-AE38786C8B7D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WPFKeyboardNative", "WPFKeyboardNative\WPFKeyboardNative.vcxproj", "{EC8EB985-A262-4DC3-8D3E-AE38786C8B7D}"
 EndProject
