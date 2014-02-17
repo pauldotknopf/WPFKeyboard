@@ -28,7 +28,6 @@ namespace WPFKeyboard.Models
 
         public void KeyDown(KeyEventArgs args)
         {
-            Debug.WriteLine(args.KeyCode);
             if (args.KeyCode == Keys.ShiftKey || args.KeyCode == Keys.LShiftKey || args.KeyCode == Keys.RShiftKey)
             {
                 Display = _modified;

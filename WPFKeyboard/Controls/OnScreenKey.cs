@@ -85,13 +85,15 @@ namespace WPFKeyboard.Controls
         /// <param name="e"></param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            Content = ViewModel != null ? _onScreenKeyboard.BuildContentControlForKey(ViewModel) : null;
+        }
+
+        protected override void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnIsPressedChanged(e);
             if (ViewModel != null)
             {
-                Content = _onScreenKeyboard.BuildContentControlForKey(ViewModel);
-            }
-            else
-            {
-                Content = null;
+                ViewModel.IsActive = IsPressed;
             }
         }
 

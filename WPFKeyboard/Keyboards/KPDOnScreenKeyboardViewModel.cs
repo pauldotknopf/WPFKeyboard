@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
 using WPFKeyboardNative;
@@ -55,14 +56,14 @@ namespace WPFKeyboard.Keyboards
             row.Keys.Add(KeyForScanCode(0x0B, layout));
             row.Keys.Add(KeyForScanCode(0x0C, layout));
             row.Keys.Add(KeyForScanCode(0x0D, layout));
-            row.Keys.Add(KeyForScanCode(0x0E, layout));
+            row.Keys.Add(KeyForScanCode(0x0E, layout, 20));
             return row;
         }
 
         private OnScreenKeyboardRowViewModel BuildRow2(KeyboardLayout layout)
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x0F, layout));
+            row.Keys.Add(KeyForScanCode(0x0F, layout, 15));
             row.Keys.Add(KeyForScanCode(0x10, layout));
             row.Keys.Add(KeyForScanCode(0x11, layout));
             row.Keys.Add(KeyForScanCode(0x12, layout));
@@ -73,16 +74,16 @@ namespace WPFKeyboard.Keyboards
             row.Keys.Add(KeyForScanCode(0x17, layout));
             row.Keys.Add(KeyForScanCode(0x18, layout));
             row.Keys.Add(KeyForScanCode(0x19, layout));
-            row.Keys.Add(KeyForScanCode(0x2B, layout));
             row.Keys.Add(KeyForScanCode(0x1A, layout));
             row.Keys.Add(KeyForScanCode(0x1B, layout));
+            row.Keys.Add(KeyForScanCode(0x2B, layout, 15));
             return row;
         }
 
         private OnScreenKeyboardRowViewModel BuildRow3(KeyboardLayout layout)
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x3A, layout));
+            row.Keys.Add(KeyForScanCode(0x3A, layout, 17));
             row.Keys.Add(KeyForScanCode(0x1E, layout));
             row.Keys.Add(KeyForScanCode(0x1F, layout));
             row.Keys.Add(KeyForScanCode(0x20, layout));
@@ -94,16 +95,16 @@ namespace WPFKeyboard.Keyboards
             row.Keys.Add(KeyForScanCode(0x26, layout));
             row.Keys.Add(KeyForScanCode(0x27, layout));
             row.Keys.Add(KeyForScanCode(0x28, layout));
-            row.Keys.Add(KeyForScanCode(0x1C, layout));
+            row.Keys.Add(KeyForScanCode(0x1C, layout, 21));
             return row;
         }
 
         private OnScreenKeyboardRowViewModel BuildRow4(KeyboardLayout layout)
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x56, layout));
-            row.Keys.Add(KeyForScanCode(0x2A, layout));
+            row.Keys.Add(KeyForScanCode(0x2A, layout, 21));
             row.Keys.Add(KeyForScanCode(0x2C, layout));
+            row.Keys.Add(KeyForScanCode(0x2D, layout));
             row.Keys.Add(KeyForScanCode(0x2E, layout));
             row.Keys.Add(KeyForScanCode(0x2F, layout));
             row.Keys.Add(KeyForScanCode(0x30, layout));
@@ -112,7 +113,7 @@ namespace WPFKeyboard.Keyboards
             row.Keys.Add(KeyForScanCode(0x33, layout));
             row.Keys.Add(KeyForScanCode(0x34, layout));
             row.Keys.Add(KeyForScanCode(0x35, layout));
-            row.Keys.Add(KeyForScanCode(0x36, layout));
+            row.Keys.Add(KeyForScanCode(0x36, layout, 25));
             return row;
         }
 
@@ -134,11 +135,13 @@ namespace WPFKeyboard.Keyboards
             return row;
         }
 
-        private BaseOnScreenKeyViewModel KeyForScanCode(int scanCode, KeyboardLayout layout)
+        private BaseOnScreenKeyViewModel KeyForScanCode(int scanCode, KeyboardLayout layout, int widthWeight = 10)
         {
+            var t = layout.ScanCodes.Where(x => x.VirtualKey == 91).FirstOrDefault();
+
             var sc = layout.ScanCodes.SingleOrDefault(x => x.Code == scanCode);
 
-            if(sc == null)
+            if (sc == null)
                 throw new Exception(string.Format("The scan code {0:X} isn't valid.", scanCode));
 
             var virtualKeyInfo = layout.VirtualKeys.SingleOrDefault(x => x.Key == sc.VirtualKey);
@@ -146,11 +149,17 @@ namespace WPFKeyboard.Keyboards
             if (virtualKeyInfo == null)
             {
                 // there is no info about this key. it is simply a virtual key (no characters, etc).
-                return new Models.VirtualKey((VirtualKeyCode)sc.VirtualKey);
+                return new Models.VirtualKey((VirtualKeyCode)sc.VirtualKey)
+                {
+                    ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)
+                };
             }
 
-            return new ShiftSensitiveKey((VirtualKeyCode) sc.VirtualKey, virtualKeyInfo.Characters.First(),
-                virtualKeyInfo.Characters.Skip(1).First());
+            return new ShiftSensitiveKey((VirtualKeyCode)sc.VirtualKey, virtualKeyInfo.Characters.First(),
+                virtualKeyInfo.Characters.Skip(1).First())
+            {
+                ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)
+            };
         }
     }
 }

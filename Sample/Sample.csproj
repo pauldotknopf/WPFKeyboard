@@ -78,7 +78,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="KeyTemplates\DefaultKeyTemplate.xaml.cs">
+      <DependentUpon>DefaultKeyTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="KeyTemplates\SampleKeyControlBuilder.cs" />
     <Compile Include="ViewModels\SampleKeyboardViewModel.cs" />
+    <Page Include="KeyTemplates\DefaultKeyTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

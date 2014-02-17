@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -168,6 +169,7 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
         {
+            Debug.WriteLine((int)args.KeyCode);
             foreach (var section in _viewModel.Sections)
             {
                 foreach (var row in section.Rows)

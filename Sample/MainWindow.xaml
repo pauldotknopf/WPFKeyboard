@@ -28,11 +28,6 @@
                                             Property="Background"
                                             Value="#626167"/>
                                 </Trigger>
-                                <Trigger Property="IsPressed" Value="true">
-                                    <Setter TargetName="Bd"
-                                            Property="Background"
-                                            Value="#FFFFFF"/>
-                                </Trigger>
                                 <Trigger Property="IsActive" Value="true">
                                     <Setter TargetName="Bd"
                                             Property="Background"
