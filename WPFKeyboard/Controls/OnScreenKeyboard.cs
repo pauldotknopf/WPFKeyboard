@@ -1,9 +1,13 @@
 ﻿using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Forms;
+using WindowsInput.Native;
 using WPFKeyboard.Models;
+using Binding = System.Windows.Data.Binding;
 
 namespace WPFKeyboard.Controls
 {
@@ -24,7 +28,7 @@ namespace WPFKeyboard.Controls
         /// See OnScreenKeyStyle
         /// </summary>
         public static readonly DependencyProperty OnScreenKeyStyleProperty =
-            DependencyProperty.Register("ButtonStyle", typeof (Style), typeof (OnScreenKeyboard), new PropertyMetadata(default(Style)));
+            DependencyProperty.Register("ButtonStyle", typeof(Style), typeof(OnScreenKeyboard), new PropertyMetadata(default(Style)));
 
         /// <summary>
         /// The style to be applied to the on screen key
@@ -43,7 +47,7 @@ namespace WPFKeyboard.Controls
 
         private static void OnScreenKeyControlBuilderPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
         {
-            var keyboard = (OnScreenKeyboard) dependencyObject;
+            var keyboard = (OnScreenKeyboard)dependencyObject;
             keyboard.RefreshKeyContentControls();
         }
 
@@ -60,7 +64,7 @@ namespace WPFKeyboard.Controls
         /// </summary>
         public IOnScreenKeyControlBuilder OnScreenKeyControlBuilder
         {
-            get { return (IOnScreenKeyControlBuilder) GetValue(OnScreenKeyControlBuilderProperty); }
+            get { return (IOnScreenKeyControlBuilder)GetValue(OnScreenKeyControlBuilderProperty); }
             set { SetValue(OnScreenKeyControlBuilderProperty, value); }
         }
 
@@ -123,7 +127,7 @@ namespace WPFKeyboard.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if(Helpers.IsInDesignMode) return;
+            if (Helpers.IsInDesignMode) return;
             Keyboard.KeyDown += OnKeyDown;
             Keyboard.KeyPress += OnKeyPress;
             Keyboard.KeyUp += OnKeyUp;
@@ -131,7 +135,7 @@ namespace WPFKeyboard.Controls
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if(Helpers.IsInDesignMode) return;
+            if (Helpers.IsInDesignMode) return;
             Keyboard.KeyDown -= OnKeyDown;
             Keyboard.KeyPress -= OnKeyPress;
             Keyboard.KeyUp -= OnKeyUp;
@@ -139,14 +143,31 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
         {
+            Debug.WriteLine((int)args.KeyCode);
+            //PrintState();
+            bool? isShifting = null;
+            bool? isCapsLockOn = null;
+
             foreach (var section in _viewModel.Sections)
             {
                 foreach (var row in section.Rows)
                 {
                     foreach (var key in row.Keys)
                     {
-                        if(key is IKeyEventListener)
-                            (key as IKeyEventListener).KeyUp(args);
+                        if (key is IKeyEventListener)
+                        {
+                            if (!isShifting.HasValue)
+                            {
+                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
+                                if (args.KeyCode == Keys.Shift 
+                                    || args.KeyCode == Keys.LShiftKey 
+                                    || args.KeyCode == Keys.RShiftKey)
+                                    isShifting = false;
+                            }
+                            if (!isCapsLockOn.HasValue)
+                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
+                            (key as IKeyEventListener).KeyUp(args, isShifting.Value, isCapsLockOn.Value);
+                        }
                     }
                 }
             }
@@ -154,6 +175,10 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs args)
         {
+            //PrintState();
+            bool? isShifting = null;
+            bool? isCapsLockOn = null;
+
             foreach (var section in _viewModel.Sections)
             {
                 foreach (var row in section.Rows)
@@ -161,7 +186,13 @@ namespace WPFKeyboard.Controls
                     foreach (var key in row.Keys)
                     {
                         if (key is IKeyEventListener)
-                            (key as IKeyEventListener).KeyPressed(args);
+                        {
+                            if (!isShifting.HasValue)
+                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
+                            if (!isCapsLockOn.HasValue)
+                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
+                            (key as IKeyEventListener).KeyPressed(args, isShifting.Value, isCapsLockOn.Value);
+                        }
                     }
                 }
             }
@@ -169,7 +200,10 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
         {
-            Debug.WriteLine((int)args.KeyCode);
+            //PrintState();
+            bool? isShifting = null;
+            bool? isCapsLockOn = null;
+
             foreach (var section in _viewModel.Sections)
             {
                 foreach (var row in section.Rows)
@@ -177,10 +211,30 @@ namespace WPFKeyboard.Controls
                     foreach (var key in row.Keys)
                     {
                         if (key is IKeyEventListener)
-                            (key as IKeyEventListener).KeyDown(args);
+                        {
+                            if (!isShifting.HasValue)
+                            {
+                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
+                                if (args.KeyCode == Keys.Shift
+                                    || args.KeyCode == Keys.LShiftKey
+                                    || args.KeyCode == Keys.RShiftKey)
+                                    isShifting = true;
+                            }
+                            if (!isCapsLockOn.HasValue)
+                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
+                            (key as IKeyEventListener).KeyDown(args, isShifting.Value, isCapsLockOn.Value);
+                        }
                     }
                 }
             }
+        }
+
+        private void PrintState()
+        {
+            Debug.WriteLine("IsKeyDown(VirtualKeyCode.SHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT));
+            Debug.WriteLine("IsKeyDown(VirtualKeyCode.RSHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.RSHIFT));
+            Debug.WriteLine("IsKeyDown(VirtualKeyCode.LSHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.LSHIFT));
+            Debug.WriteLine("IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL) == {0}", Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL));
         }
 
         #endregion
@@ -211,6 +265,6 @@ namespace WPFKeyboard.Controls
 
         #endregion
 
-        
+
     }
 }

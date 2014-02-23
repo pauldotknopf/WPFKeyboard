@@ -16,6 +16,7 @@ namespace WPFKeyboard
     {
         private static KeyboardHookListener _keyboardHookListener;
         private static InputSimulator _inputSimulator = new InputSimulator();
+        private static IInputDeviceStateAdaptor _inputDeviceStateAdaptor = new WindowsInputDeviceStateAdaptor();
         private static readonly object Lock = new object();
 
         /// <summary>
@@ -37,6 +38,11 @@ namespace WPFKeyboard
         /// Get the input simulator
         /// </summary>
         public static InputSimulator Simulator { get { return _inputSimulator; } }
+
+        /// <summary>
+        /// Get the input device state adapter
+        /// </summary>
+        public static IInputDeviceStateAdaptor InputDeviceStateAdapter { get { return _inputDeviceStateAdaptor; } }
 
         /// <summary>
         /// Occurs when a key is pressed. 

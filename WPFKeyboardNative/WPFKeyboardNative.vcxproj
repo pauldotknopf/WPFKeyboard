@@ -94,6 +94,7 @@
     <ClInclude Include="ScanCode.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="VirtualKey.h" />
+    <ClInclude Include="ScanCodeText.h" />
     <ClInclude Include="WPFKeyboardNative.h" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +109,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="VirtualKey.cpp" />
+    <ClCompile Include="ScanCodeText.cpp" />
     <ClCompile Include="WPFKeyboardNative.cpp" />
   </ItemGroup>
   <ItemGroup>

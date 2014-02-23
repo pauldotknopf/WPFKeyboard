@@ -15,13 +15,15 @@ namespace WPFKeyboard.Models
         private readonly VirtualKeyCode _keyCode;
         private readonly string _normal;
         private readonly string _modified;
+        private readonly string _displayText;
 
-        public ShiftSensitiveKey(VirtualKeyCode keyCode, string normal, string modified)
+        public ShiftSensitiveKey(VirtualKeyCode keyCode, string normal, string modified, string displayText)
         {
             _keyCode = keyCode;
             _normal = normal;
             _modified = modified;
-            Display = _normal;
+            _displayText = displayText;
+            Display = !string.IsNullOrEmpty(_displayText) ? _displayText : _normal;
         }
 
         #region IKeyEventListener
@@ -30,7 +32,7 @@ namespace WPFKeyboard.Models
         {
             if (args.KeyCode == Keys.ShiftKey || args.KeyCode == Keys.LShiftKey || args.KeyCode == Keys.RShiftKey)
             {
-                Display = _modified;
+                Display = !string.IsNullOrEmpty(_displayText) ? _displayText : _modified;
             }else if ((int)args.KeyCode == (int)_keyCode)
             {
                 IsActive = true;
@@ -46,7 +48,7 @@ namespace WPFKeyboard.Models
         {
             if (args.KeyCode == Keys.ShiftKey || args.KeyCode == Keys.LShiftKey || args.KeyCode == Keys.RShiftKey)
             {
-                Display = _normal;
+                Display = !string.IsNullOrEmpty(_displayText) ? _displayText : _normal;
             }
             else if ((int)args.KeyCode == (int)_keyCode)
             {

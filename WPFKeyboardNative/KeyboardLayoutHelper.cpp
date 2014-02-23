@@ -28,23 +28,28 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 			layout->CharModifiers->Add(gcnew CharModifier(kll->GetModifierAtIndex(i)->VirtualKey, kll->GetModifierAtIndex(i)->ModifierBits));
 		}
 
-		for(BYTE i=0;i < kll->GetVKCount(); i++)
+		for(int i=0;i < kll->GetVKCount(); i++)
 		{
 			CKLL::VK_STRUCT *vk = kll->GetVKAtIndex(i);
 
-			array<String^>^ characters = gcnew array<String^>(vk->characters.size());
+			array<String^>^ characters = gcnew array<String^>(vk->Characters.size());
 
-			for(int y = 0; y <vk->characters.size(); y++)
+			for(int y = 0; y <vk->Characters.size(); y++)
 			{
-				characters[y] = gcnew String(vk->characters[y], 1);
+				characters[y] = gcnew String(vk->Characters[y], 1);
 			}
 
-			layout->VirtualKeys->Add(gcnew VirtualKey(vk->nVK, vk->attributes, characters));
+			layout->VirtualKeys->Add(gcnew VirtualKey(vk->VirtualKey, vk->Attributes, characters));
 		}
 
-		for(BYTE i=0;i < kll->GetScanCodesCount(); i++)
+		for(int i=0;i < kll->GetScanCodesCount(); i++)
 		{
-			layout->ScanCodes->Add(gcnew ScanCode(kll->GetScanCodeAtIndex(i)->nVK, kll->GetScanCodeAtIndex(i)->scanCode));
+			layout->ScanCodes->Add(gcnew ScanCode(kll->GetScanCodeAtIndex(i)->VirtualKey, kll->GetScanCodeAtIndex(i)->ScanCode, kll->GetScanCodeAtIndex(i)->E0Set, kll->GetScanCodeAtIndex(i)->E1Set));
+		}
+
+		for(int i=0;i < kll->GetScanCodeTextCount(); i++)
+		{
+			layout->CodeText->Add(gcnew ScanCodeText(kll->GetScanCodeTextAtIndex(i)->ScanCode, gcnew String(kll->GetScanCodeTextAtIndex(i)->Text)));
 		}
 
 		return layout;

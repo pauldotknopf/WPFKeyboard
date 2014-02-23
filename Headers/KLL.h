@@ -16,9 +16,9 @@ public:
 
 	struct VK_STRUCT
 	{
-		USHORT nVK;
-		BYTE attributes;
-		std::vector<wchar_t> characters;
+		int VirtualKey;
+		int Attributes;
+		std::vector<wchar_t> Characters;
 	};
 	struct VK_MODIFIER
 	{
@@ -27,8 +27,15 @@ public:
 	};
 	struct VK_SCANCODE
 	{
-		USHORT nVK;
-		int scanCode;
+		int VirtualKey;
+		int ScanCode;
+		bool E0Set;
+		bool E1Set;
+	};
+	struct SC_TEXT
+	{
+		int ScanCode;
+		wchar_t *Text;
 	};
 
 	CKLL(void);
@@ -38,14 +45,17 @@ public:
 	
 	BOOL	Is64BitWindows();
 
-	USHORT	GetVKCount();
-	CKLL::VK_STRUCT* CKLL::GetVKAtIndex(BYTE index);
+	int	GetVKCount();
+	CKLL::VK_STRUCT* CKLL::GetVKAtIndex(int index);
 
-	USHORT GetModifiersCount();
-	CKLL::VK_MODIFIER* GetModifierAtIndex(BYTE index);
+	int GetModifiersCount();
+	CKLL::VK_MODIFIER* GetModifierAtIndex(int index);
 
-	USHORT GetScanCodesCount();
-	CKLL::VK_SCANCODE* GetScanCodeAtIndex(BYTE index);
+	int GetScanCodesCount();
+	CKLL::VK_SCANCODE* GetScanCodeAtIndex(int index);
+
+	int GetScanCodeTextCount();
+	CKLL::SC_TEXT* GetScanCodeTextAtIndex(int index);
 
 private:
 	//Our loaded DLL
@@ -69,4 +79,6 @@ private:
 	void ClearVKModifiers();	
 	std::vector<VK_SCANCODE*> m_vkScanCodesArray;
 	void ClearVKScanCodes();
+	std::vector<SC_TEXT*> m_scTextArray;
+	void ClearSCText();
 };

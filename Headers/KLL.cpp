@@ -16,6 +16,7 @@ CKLL::~CKLL(void)
 	this->ClearVKChar();
 	this->ClearVKModifiers();
 	this->ClearVKScanCodes();
+	this->ClearSCText();
 	this->UnloadDLL();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -68,6 +69,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 		this->ClearVKChar();
 		this->ClearVKModifiers();
 		this->ClearVKScanCodes();
+		this->ClearSCText();
 		this->Fill32();
 	}
 	else //64-bit
@@ -85,6 +87,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 		this->ClearVKChar();
 		this->ClearVKModifiers();
 		this->ClearVKScanCodes();
+		this->ClearSCText();
 		this->Fill64();
 	}
 
@@ -96,7 +99,6 @@ void CKLL::UnloadDLL()
 	//Free DLL, if loaded
 	if(hHandle != NULL)
 	{
-		//TRACE(L"Free handle of keyboard dll...\n");
 		FreeLibrary(hHandle);
 		hHandle = NULL;
 		KbdTables = NULL;
@@ -200,12 +202,12 @@ void CKLL::Fill64()
 		{
 			printf("Virtual Key: %d\n", pVkToWch->VirtualKey);
 			VK_STRUCT *pVK = new VK_STRUCT();
-			pVK->nVK = pVkToWch->VirtualKey;
-			pVK->attributes = pVkToWch->Attributes;
+			pVK->VirtualKey = (int)pVkToWch->VirtualKey;
+			pVK->Attributes = pVkToWch->Attributes;
 
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
-				pVK->characters.insert(pVK->characters.end(), pVkToWch->wch[i]);
+				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);
 
@@ -215,12 +217,45 @@ void CKLL::Fill64()
 	}
 
 	// virtual key scan codes
-	for(int i = 0; i < KbdTables64->bMaxVSCtoVK; i++ ) {
-
+	for(int i = 0; i < KbdTables64->bMaxVSCtoVK; i++ ) 
+	{
 		VK_SCANCODE *scanCode = new VK_SCANCODE();
-		scanCode->nVK = KbdTables64->pusVSCtoVK[i];
-		scanCode->scanCode = i;
+		scanCode->VirtualKey = KbdTables64->pusVSCtoVK[i];
+		scanCode->ScanCode = i;
 		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+	}
+	
+	PVSC_VK64 E0ScanCodes = KbdTables64->pVSCtoVK_E0;
+	while(E0ScanCodes->Vsc > 0)
+	{
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->VirtualKey = E0ScanCodes->Vk;
+		scanCode->ScanCode = E0ScanCodes->Vsc;
+		scanCode->E0Set = true;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+		E0ScanCodes++;
+	}
+
+	PVSC_VK64 E1ScanCodes = KbdTables64->pVSCtoVK_E1;
+	while(E1ScanCodes->Vsc > 0)
+	{
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->VirtualKey = E1ScanCodes->Vk;
+		scanCode->ScanCode = E1ScanCodes->Vsc;
+		scanCode->E1Set = true;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+		E1ScanCodes++;
+	}
+
+	// virtual key text
+	PVSC_LPWSTR64 keyNames = KbdTables64->pKeyNames;
+	while(keyNames->vsc)
+	{
+		SC_TEXT *scanCodeText = new SC_TEXT();
+		scanCodeText->ScanCode = keyNames->vsc;
+		scanCodeText->Text = keyNames->pwsz;
+		m_scTextArray.insert(m_scTextArray.end(), scanCodeText);
+		keyNames++;
 	}
 
 	///*PDEADKEY64 pDEADKEY64 = KbdTables64->pDEADKEY64;
@@ -231,12 +266,12 @@ void CKLL::Fill64()
 	//}*/
 }
 
-USHORT CKLL::GetVKCount()
+int CKLL::GetVKCount()
 {
 	return m_vkarray.size();
 }
 
-CKLL::VK_STRUCT* CKLL::GetVKAtIndex(BYTE index)
+CKLL::VK_STRUCT* CKLL::GetVKAtIndex(int index)
 {
 	return m_vkarray[index];
 }
@@ -251,12 +286,12 @@ void CKLL::ClearVKChar()
 	m_vkarray.clear();
 }
 
-USHORT CKLL::GetModifiersCount()
+int CKLL::GetModifiersCount()
 {
 	return m_vkModifiersArray.size();
 }
 
-CKLL::VK_MODIFIER* CKLL::GetModifierAtIndex(BYTE index)
+CKLL::VK_MODIFIER* CKLL::GetModifierAtIndex(int index)
 {
 	return m_vkModifiersArray[index];
 }
@@ -272,12 +307,13 @@ void CKLL::ClearVKModifiers()
 }
 
 
-USHORT CKLL::GetScanCodesCount()
+int CKLL::GetScanCodesCount()
 {
-	return m_vkScanCodesArray.size();
+	int result = m_vkScanCodesArray.size();
+	return result;
 }
 
-CKLL::VK_SCANCODE* CKLL::GetScanCodeAtIndex(BYTE index)
+CKLL::VK_SCANCODE* CKLL::GetScanCodeAtIndex(int index)
 {
 	return m_vkScanCodesArray[index];
 }
@@ -290,6 +326,26 @@ void CKLL::ClearVKScanCodes()
 		delete pVK;
 	}
 	m_vkScanCodesArray.clear();
+}
+
+int CKLL::GetScanCodeTextCount()
+{
+	return m_scTextArray.size();
+}
+
+CKLL::SC_TEXT* CKLL::GetScanCodeTextAtIndex(int index)
+{
+	return m_scTextArray[index];
+}
+
+void CKLL::ClearSCText()
+{
+	for(int i = 0;i<m_scTextArray.size();i++)
+	{
+		SC_TEXT *pVK = m_scTextArray[i];
+		delete pVK;
+	}
+	m_scTextArray.clear();
 }
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
