@@ -24,7 +24,7 @@ namespace WPFKeyboard.Models
             _characters = characters;
             _isAffectedByCapsLock = isAffectedByCapsLock;
             _displayText = displayText;
-            Display = displayText;
+            Display = GetDisplayValue(false, false);
         }
 
         public void ButtonDown()

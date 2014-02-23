@@ -183,7 +183,7 @@ namespace WPFKeyboard.Keyboards
             row.Keys.Add(KeyForScanCode(0x1D, layout));             // right control
             row.Keys.Add(KeyForScanCode(0x5B, layout, isE0: true)); // left windows
             row.Keys.Add(KeyForScanCode(0x38, layout));             // left alt
-            row.Keys.Add(KeyForScanCode(0x39, layout));             // space bar
+            row.Keys.Add(KeyForScanCode(0x39, layout, 45));         // space bar
             row.Keys.Add(KeyForScanCode(0x38, layout, isE0: true)); // right alt
             row.Keys.Add(KeyForScanCode(0x5C, layout, isE0: true)); // right windows
             row.Keys.Add(KeyForScanCode(0x5D, layout, isE0: true)); // menu
