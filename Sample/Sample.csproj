@@ -82,8 +82,15 @@
       <DependentUpon>DefaultKeyTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="KeyTemplates\SampleKeyControlBuilder.cs" />
+    <Compile Include="KeyTemplates\WindowsKeyTemplate.xaml.cs">
+      <DependentUpon>WindowsKeyTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\SampleKeyboardViewModel.cs" />
     <Page Include="KeyTemplates\DefaultKeyTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="KeyTemplates\WindowsKeyTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,6 +140,9 @@
       <Project>{1b56a2ab-181d-4c58-9230-bf3f286a5d35}</Project>
       <Name>WPFKeyboard</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Windows8Logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

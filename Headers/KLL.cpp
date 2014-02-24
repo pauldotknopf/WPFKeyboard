@@ -207,6 +207,8 @@ void CKLL::Fill64()
 
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
+				//std::wcout << "Char: " << pVkToWch->wch[i] << "\n";
+				printf("Char: %d\n", pVkToWch->wch[i]);
 				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);

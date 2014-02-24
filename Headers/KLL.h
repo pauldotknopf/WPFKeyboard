@@ -18,7 +18,7 @@ public:
 	{
 		int VirtualKey;
 		int Attributes;
-		std::vector<wchar_t> Characters;
+		std::vector<int> Characters;
 	};
 	struct VK_MODIFIER
 	{

@@ -88,6 +88,7 @@
     <ClInclude Include="..\Headers\kbd64.h" />
     <ClInclude Include="..\Headers\KLL.h" />
     <ClInclude Include="CharModifier.h" />
+    <ClInclude Include="Definitions.h" />
     <ClInclude Include="KeyboardLayout.h" />
     <ClInclude Include="KeyboardLayoutHelper.h" />
     <ClInclude Include="resource.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="..\Headers\KLL.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CharModifier.cpp" />
+    <ClCompile Include="Definitions.cpp" />
     <ClCompile Include="KeyboardLayout.cpp" />
     <ClCompile Include="KeyboardLayoutHelper.cpp" />
     <ClCompile Include="ScanCode.cpp" />

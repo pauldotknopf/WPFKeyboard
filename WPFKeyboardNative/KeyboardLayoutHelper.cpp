@@ -32,11 +32,11 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 		{
 			CKLL::VK_STRUCT *vk = kll->GetVKAtIndex(i);
 
-			array<String^>^ characters = gcnew array<String^>(vk->Characters.size());
+			array<int>^ characters = gcnew array<int>(vk->Characters.size());
 
 			for(int y = 0; y <vk->Characters.size(); y++)
 			{
-				characters[y] = gcnew String(vk->Characters[y], 1);
+				characters[y] = (int)vk->Characters[y];
 			}
 
 			layout->VirtualKeys->Add(gcnew VirtualKey(vk->VirtualKey, vk->Attributes, characters));

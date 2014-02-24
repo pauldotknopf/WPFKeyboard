@@ -85,8 +85,8 @@ namespace WPFKeyboard.Keyboards
             sb.AppendLine("---------");
             foreach (var virtualkey in keyboardLayout.VirtualKeys)
             {
-                sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}", virtualkey.Key,
-                    virtualkey.Attributes));
+                sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}:Characters:{2}", virtualkey.Key,
+                    virtualkey.Attributes, string.Join(" - ", virtualkey.Characters.Select(x => string.Format("{0:X}", x)))));
             }
 
             var result = sb.ToString();
@@ -206,7 +206,7 @@ namespace WPFKeyboard.Keyboards
 
             return new Models.VirtualKey(virtualKey,
                 scanCodeText != null ? scanCodeText.Text : null,
-                virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<string>(),
+                virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
                 virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)
                 {
                     ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)

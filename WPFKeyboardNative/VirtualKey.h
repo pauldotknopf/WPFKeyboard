@@ -7,11 +7,11 @@ namespace WPFKeyboardNative
 	private:
 		int _virtualkey;
 		int _attributes;
-		array<String^>^ _characters;
+		array<int>^ _characters;
 	public:
-		VirtualKey(int virtualKey, int attributes, array<String^>^ characters);
+		VirtualKey(int virtualKey, int attributes, array<int>^ characters);
 		property int Key { int get (); }
-		property array<String^>^ Characters { array<String^>^ get (); }
+		property array<int>^ Characters { array<int>^ get (); }
 		property int Attributes { int get (); }
 	};
 }

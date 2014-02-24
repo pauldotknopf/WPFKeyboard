@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VirtualKey.h"
 
-WPFKeyboardNative::VirtualKey::VirtualKey(int virtualKey, int attributes, array<String^>^ characters)
+WPFKeyboardNative::VirtualKey::VirtualKey(int virtualKey, int attributes, array<int>^ characters)
 {
 	_attributes = attributes;
 	_virtualkey = virtualKey;
@@ -13,7 +13,7 @@ int WPFKeyboardNative::VirtualKey::Key::get()
 	return _virtualkey;
 }
 
-array<String^>^ WPFKeyboardNative::VirtualKey::Characters::get()
+array<int>^ WPFKeyboardNative::VirtualKey::Characters::get()
 {
 	return _characters;
 }
