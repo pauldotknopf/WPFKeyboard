@@ -132,6 +132,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WPFKeyboard.KBD\WPFKeyboard.KBD.csproj">
+      <Project>{23207fa6-7dca-4ece-be26-1d0b25e4b326}</Project>
+      <Name>WPFKeyboard.KBD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WPFKeyboard\WPFKeyboard.csproj">
       <Project>{1b56a2ab-181d-4c58-9230-bf3f286a5d35}</Project>
       <Name>WPFKeyboard</Name>

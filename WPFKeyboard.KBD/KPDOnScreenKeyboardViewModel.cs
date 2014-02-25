@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Input;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
 using WPFKeyboardNative;
 
-namespace WPFKeyboard.Keyboards
+namespace WPFKeyboard
 {
     /// <summary>
     /// This view model uses a KPD dll to build the keyboard layout.
@@ -204,7 +200,7 @@ namespace WPFKeyboard.Keyboards
 
             var scanCodeText = layout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
 
-            return new Models.VirtualKey(virtualKey,
+            return new VirtualKey(virtualKey,
                 scanCodeText != null ? scanCodeText.Text : null,
                 virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
                 virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)

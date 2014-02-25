@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using WindowsInput.Native;
+﻿using WindowsInput.Native;
+using WPFKeyboard;
 using WPFKeyboard.Models;
 
 namespace Sample.KeyTemplates

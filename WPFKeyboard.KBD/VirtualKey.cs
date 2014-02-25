@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using WindowsInput;
+﻿using System.Collections.Generic;
 using WindowsInput.Native;
+using WPFKeyboard.Models;
 using WPFKeyboardNative;
 
-namespace WPFKeyboard.Models
+namespace WPFKeyboard
 {
     public class VirtualKey : BaseOnScreenKeyViewModel, IButtonEventListener, IKeyEventListener
     {
