@@ -132,10 +132,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WPFKeyboardNative\WPFKeyboardNative.vcxproj">
-      <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
-      <Name>WPFKeyboardNative</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WPFKeyboard\WPFKeyboard.csproj">
       <Project>{1b56a2ab-181d-4c58-9230-bf3f286a5d35}</Project>
       <Name>WPFKeyboard</Name>

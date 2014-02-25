@@ -72,9 +72,9 @@
     <Compile Include="Controls\OnScreenKeyboard.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WPFKeyboardNative\WPFKeyboardNative.vcxproj">
+    <ProjectReference Include="..\WindowsKeyboardLayout\WindowsKeyboardLayout.vcxproj">
       <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
-      <Name>WPFKeyboardNative</Name>
+      <Name>WindowsKeyboardLayout</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

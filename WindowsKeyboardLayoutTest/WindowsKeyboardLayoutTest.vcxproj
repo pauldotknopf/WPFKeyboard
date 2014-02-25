@@ -13,7 +13,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F17016EA-957F-4728-8BF0-1D8893067EE8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>WPFKeyboardNativeTest</RootNamespace>
+    <RootNamespace>WindowsKeyboardLayoutTest</RootNamespace>
+    <ProjectName>WindowsKeyboardLayoutTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
