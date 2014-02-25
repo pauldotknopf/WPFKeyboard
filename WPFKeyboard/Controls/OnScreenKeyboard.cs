@@ -20,15 +20,6 @@ namespace WPFKeyboard.Controls
             DataContextChanged += OnDataContextChanged;
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
-            Task.Factory.StartNew(() =>
-            {
-                while (true)
-                {
-                    Keyboard.Simulator.Keyboard.KeyDown(VirtualKeyCode.KANA);
-                    Keyboard.Simulator.Keyboard.KeyUp(VirtualKeyCode.KANA);
-                    Thread.Sleep(5000);
-                }
-            });
         }
 
         #region Properties
