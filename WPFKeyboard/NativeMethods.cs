@@ -73,6 +73,15 @@ namespace WPFKeyboard
             uint wFlags,
             IntPtr hkl);
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, ThrowOnUnmappableChar = true)]
+        public static extern int ToUnicode(
+            uint wVirtKey,
+            uint wScanCode,
+            byte[] lpKeyState,
+            StringBuilder pwszBuff,
+            int cchBuff,
+            uint wFlags);
+
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int GetKeyboardLayoutName([Out] StringBuilder pwszKLID);
 

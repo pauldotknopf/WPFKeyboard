@@ -16,13 +16,33 @@ namespace WPFKeyboard
                 _state.Add(modiferVirtualKey, false);
             if(!_state.ContainsKey(VirtualKeyCode.CAPITAL))
                 _state.Add(VirtualKeyCode.CAPITAL, false);
-            Refresh();
         }
 
-        public void Refresh()
+        public void Refresh(VirtualKeyCode? keyUp = null, VirtualKeyCode? keyDown = null)
         {
             foreach (var virtualKey in _state.Keys.ToList())
             {
+                if (virtualKey == VirtualKeyCode.SHIFT)
+                {
+                    if (keyDown.HasValue)
+                    {
+                        if (keyDown.Value == VirtualKeyCode.SHIFT || keyDown.Value == VirtualKeyCode.LSHIFT ||
+                            keyDown.Value == VirtualKeyCode.RSHIFT)
+                        {
+                            _state[virtualKey] = true;
+                            continue;
+                        }
+                    }
+                    if (keyUp.HasValue)
+                    {
+                        if (keyUp.Value == VirtualKeyCode.SHIFT || keyUp.Value == VirtualKeyCode.LSHIFT ||
+                            keyUp.Value == VirtualKeyCode.RSHIFT)
+                        {
+                            _state[virtualKey] = false;
+                            continue;
+                        }
+                    }
+                }
                 _state[virtualKey] = IsToggleKey(virtualKey)
                     ? Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(virtualKey)
                     : Keyboard.InputDeviceStateAdapter.IsKeyDown(virtualKey);

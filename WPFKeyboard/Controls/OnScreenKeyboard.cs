@@ -149,7 +149,7 @@ namespace WPFKeyboard.Controls
             bool? isCapsLockOn = null;
 
             if(_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh();
+                _viewModel.ModiferState.Refresh(keyUp:(VirtualKeyCode)args.KeyCode);
 
             foreach (var section in _viewModel.Sections)
             {
@@ -211,7 +211,7 @@ namespace WPFKeyboard.Controls
             bool? isCapsLockOn = null;
 
             if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh();
+                _viewModel.ModiferState.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
 
             foreach (var section in _viewModel.Sections)
             {

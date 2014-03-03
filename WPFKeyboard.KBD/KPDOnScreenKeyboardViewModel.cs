@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
 using WPFKeyboardNative;
@@ -23,7 +24,8 @@ namespace WPFKeyboard
         /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
         public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
-            _keyboardLayout = NativeMethods.LoadKeyboardLayout(KeyboardHelper.GetCurrentKeyboardLocale(), NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
+            var installedInputLanguage = InputLanguage.InstalledInputLanguages.Cast<InputLanguage>().SingleOrDefault(x => x.LayoutName == installedKeyboardLayout.LayoutDisplayName);
+            _keyboardLayout = installedInputLanguage != null ? installedInputLanguage.Handle : NativeMethods.LoadKeyboardLayout(installedKeyboardLayout.Locale, NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
             BuildKeyboardLayout(KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile)));
         }
 

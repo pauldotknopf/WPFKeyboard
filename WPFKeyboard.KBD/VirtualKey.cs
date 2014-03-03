@@ -69,7 +69,7 @@ namespace WPFKeyboard
             if (!string.IsNullOrEmpty(_displayText))
                 return _displayText;
 
-            return KeyboardHelper.GetKeyNameFromVirtualKey(_keyboardLayout, _virtualKey, modifierState);
+            return KeyboardHelper.GetKeyNameFromVirtualKey(_keyboardLayout, _virtualKey, modifierState, _isAffectedByCapsLock);
         }
     }
 }

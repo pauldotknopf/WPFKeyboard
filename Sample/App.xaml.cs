@@ -38,6 +38,7 @@ namespace Sample
 
         private void OnStartup(object sender, StartupEventArgs startupEventArgs)
         {
+            var result =  System.Windows.Forms.InputLanguage.InstalledInputLanguages;
             //var layout = KeyboardLayoutHelper.GetLayout(@"C:\Windows\SysWOW64\KBDJPN.DLL");
 
             //KeyboardHelper.GetInstalledKeyboardList();

@@ -18,21 +18,30 @@ namespace WPFKeyboard
             GetInstalledKeyboardList();
         }
 
-        public static string GetKeyNameFromVirtualKey(IntPtr keyboardLayout, VirtualKeyCode virtualKey, ModiferState modifierState)
+        public static string GetKeyNameFromVirtualKey(IntPtr keyboardLayout, VirtualKeyCode virtualKey, ModiferState modifierState, bool capsAffectsShift)
         {
             var keyState = new byte[256];
             foreach (var modifierVirtualKey in modifierState.GetVirtualKeys())
             {
-                if (modifierState.GetModifierState(modifierVirtualKey))
+                if (modifierVirtualKey == VirtualKeyCode.CAPITAL) continue;
+
+                if (modifierVirtualKey == VirtualKeyCode.SHIFT && capsAffectsShift)
                 {
-                    //if (modifierVirtualKey == VirtualKeyCode.CAPITAL)
-                    //{
-                    //    keyState[(int) VirtualKeyCode.SHIFT] = 0x80;
-                    //}
-                    //else
-                    //{
+                    if (modifierState.GetModifierState(VirtualKeyCode.CAPITAL))
+                    {
+                        keyState[(int)modifierVirtualKey] = (byte)(modifierState.GetModifierState(modifierVirtualKey) ? 0x00 : 0x80);
+                    }
+                    else
+                    {
+                        keyState[(int)modifierVirtualKey] = (byte)(modifierState.GetModifierState(modifierVirtualKey) ? 0x80 : 0x00);
+                    }
+                }
+                else
+                {
+                    if (modifierState.GetModifierState(modifierVirtualKey))
                         keyState[(int)modifierVirtualKey] = 0x80;
-                    //}
+                    else
+                        keyState[(int)modifierVirtualKey] = 0x00;
                 }
             }
 
