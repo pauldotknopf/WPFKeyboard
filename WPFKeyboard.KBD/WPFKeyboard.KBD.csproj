@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KPDOnScreenKeyboardViewModel.cs" />
+    <Compile Include="CharacterKey.cs" />
+    <Compile Include="ModiferState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VirtualKey.cs" />
   </ItemGroup>

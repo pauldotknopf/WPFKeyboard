@@ -4,7 +4,7 @@ using WPFKeyboard.Models;
 
 namespace Sample.KeyTemplates
 {
-    public class SampleKeyControlBuilder : WPFKeyboard.IOnScreenKeyControlBuilder
+    public class SampleKeyControlBuilder : IOnScreenKeyControlBuilder
     {
         public object BuildControlForKey(BaseOnScreenKeyViewModel keyViewModel)
         {

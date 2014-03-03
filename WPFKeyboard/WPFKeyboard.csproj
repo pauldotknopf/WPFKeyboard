@@ -55,16 +55,19 @@
     <Compile Include="Controls\OnScreenKeyboardSection.cs" />
     <Compile Include="Controls\OnScreenKeyboardRow.cs" />
     <Compile Include="DefaultOnScreenKeyControlBuilder.cs" />
+    <Compile Include="InstalledKeyboardLayout.cs" />
     <Compile Include="IOnScreenKeyControlBuilder.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IButtonEventListener.cs" />
     <Compile Include="IKeyEventListener.cs" />
     <Compile Include="Keyboard.cs" />
+    <Compile Include="KeyboardHelper.cs" />
     <Compile Include="Models\OnScreenKeyboardViewModel.cs" />
     <Compile Include="BaseViewModel.cs" />
     <Compile Include="Models\OnScreenKeyboardRowViewModel.cs" />
     <Compile Include="Models\OnScreenKeyboardSectionViewModel.cs" />
     <Compile Include="Models\BaseOnScreenKeyViewModel.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\OnScreenKeyboard.cs" />
   </ItemGroup>
