@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
@@ -14,13 +15,16 @@ namespace WPFKeyboard
     /// </summary>
     public class KPDOnScreenKeyboardViewModel : OnScreenKeyboardViewModel
     {
+        private IntPtr _keyboardLayout;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel"/> class.
+        /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel" /> class.
         /// </summary>
-        /// <param name="kpdFileLocation">The KPD file location.</param>
-        public KPDOnScreenKeyboardViewModel(string kpdFileLocation)
+        /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
+        public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
-            BuildKeyboardLayout(KeyboardLayoutHelper.GetLayout(kpdFileLocation));
+            _keyboardLayout = NativeMethods.LoadKeyboardLayout(KeyboardHelper.GetCurrentKeyboardLocale(), NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
+            BuildKeyboardLayout(KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile)));
         }
 
         /// <summary>
@@ -29,6 +33,7 @@ namespace WPFKeyboard
         /// <param name="keyboardLayout">The keyboard layout.</param>
         public void BuildKeyboardLayout(KeyboardLayout keyboardLayout)
         {
+            ModiferState = new ModiferState(keyboardLayout.CharModifiers.Select(x => (VirtualKeyCode)x.VirtualKey).ToList());
             //var sb = new StringBuilder();
 
             //sb.AppendLine("---------");
@@ -201,8 +206,9 @@ namespace WPFKeyboard
             var scanCodeText = layout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
 
             return new VirtualKey(virtualKey,
+                _keyboardLayout,
                 scanCodeText != null ? scanCodeText.Text : null,
-                virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
+                ModiferState,
                 virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)
                 {
                     ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)

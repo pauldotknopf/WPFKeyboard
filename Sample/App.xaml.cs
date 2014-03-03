@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using WindowsInput.Native;
 using Microsoft.Win32;
@@ -35,29 +38,41 @@ namespace Sample
 
         private void OnStartup(object sender, StartupEventArgs startupEventArgs)
         {
-            var layout = KeyboardLayoutHelper.GetLayout(@"C:\Windows\SysWOW64\KBDJPN.DLL");
+            //var layout = KeyboardLayoutHelper.GetLayout(@"C:\Windows\SysWOW64\KBDJPN.DLL");
 
-            KeyboardHelper.GetInstalledKeyboardList();
-            var identifier = NativeMethods.LoadKeyboardLayout(KeyboardHelper.InstalledKeyboardLayouts["Japanese"].Locale, 
-                NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
+            //KeyboardHelper.GetInstalledKeyboardList();
+            //var identifier = NativeMethods.LoadKeyboardLayout(KeyboardHelper.InstalledKeyboardLayouts["Japanese"].Locale, NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
 
-            foreach (var modifier in layout.CharModifiers)
-            {
-                var keyState = new byte[256];
-                //keyState[modifier.VirtualKey] = 0x80;
-                keyState[(int) VirtualKeyCode.KANA] = 0x80;
-                keyState[(int) VirtualKeyCode.SHIFT] = 0x80;
-                //keyState[(int) VirtualKeyCode.SHIFT] = 0x80;
-                const int bufferLength = 10;
+            //var state = new ModiferState(layout.CharModifiers.Select(x => (VirtualKeyCode)x.VirtualKey).ToList());
 
-                // Get the key itself:
-                var character = new StringBuilder(bufferLength);
+            //Task.Factory.StartNew(() =>
+            //{
+            //    while (true)
+            //    {
+            //        state.Refresh();
+            //        foreach (var key in state.GetVirtualKeys())
+            //        {
+            //            Debug.WriteLine(key + ":" + state.GetModifierState(key));
+            //        }
+            //        Thread.Sleep(1000);
+            //    }
+            //});
 
-                var result = NativeMethods.ToUnicodeEx((uint) VirtualKeyCode.VK_A, 0, keyState, character,
-                    character.Capacity, 0, identifier);
-            }
+            //foreach (var modifier in layout.CharModifiers)
+            //{
+            //    var keyState = new byte[256];
+            //    //keyState[modifier.VirtualKey] = 0x80;
+            //    keyState[(int)VirtualKeyCode.KANA] = 0x80;
+            //    keyState[(int)VirtualKeyCode.SHIFT] = 0x80;
+            //    //keyState[(int) VirtualKeyCode.SHIFT] = 0x80;
+            //    const int bufferLength = 10;
 
-            
+            //    // Get the key itself:
+            //    var character = new StringBuilder(bufferLength);
+
+            //    var result = NativeMethods.ToUnicodeEx((uint)VirtualKeyCode.VK_A, 0, keyState, character,
+            //        character.Capacity, 0, identifier);
+            //}
         }
     }
 }

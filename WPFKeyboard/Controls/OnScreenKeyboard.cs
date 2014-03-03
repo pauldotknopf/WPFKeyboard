@@ -148,6 +148,9 @@ namespace WPFKeyboard.Controls
             bool? isShifting = null;
             bool? isCapsLockOn = null;
 
+            if(_viewModel.ModiferState != null)
+                _viewModel.ModiferState.Refresh();
+
             foreach (var section in _viewModel.Sections)
             {
                 foreach (var row in section.Rows)
@@ -166,7 +169,7 @@ namespace WPFKeyboard.Controls
                             }
                             if (!isCapsLockOn.HasValue)
                                 isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
-                            (key as IKeyEventListener).KeyUp(args, isShifting.Value, isCapsLockOn.Value);
+                            (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferState);
                         }
                     }
                 }
@@ -178,6 +181,9 @@ namespace WPFKeyboard.Controls
             //PrintState();
             bool? isShifting = null;
             bool? isCapsLockOn = null;
+
+            if (_viewModel.ModiferState != null)
+                _viewModel.ModiferState.Refresh();
 
             foreach (var section in _viewModel.Sections)
             {
@@ -191,7 +197,7 @@ namespace WPFKeyboard.Controls
                                 isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
                             if (!isCapsLockOn.HasValue)
                                 isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
-                            (key as IKeyEventListener).KeyPressed(args, isShifting.Value, isCapsLockOn.Value);
+                            (key as IKeyEventListener).KeyPressed(args, _viewModel.ModiferState);
                         }
                     }
                 }
@@ -203,6 +209,9 @@ namespace WPFKeyboard.Controls
             //PrintState();
             bool? isShifting = null;
             bool? isCapsLockOn = null;
+
+            if (_viewModel.ModiferState != null)
+                _viewModel.ModiferState.Refresh();
 
             foreach (var section in _viewModel.Sections)
             {
@@ -222,7 +231,7 @@ namespace WPFKeyboard.Controls
                             }
                             if (!isCapsLockOn.HasValue)
                                 isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
-                            (key as IKeyEventListener).KeyDown(args, isShifting.Value, isCapsLockOn.Value);
+                            (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferState);
                         }
                     }
                 }
