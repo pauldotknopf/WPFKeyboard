@@ -13,6 +13,7 @@ CKLL::CKLL(void)
 
 CKLL::~CKLL(void)
 {
+	_localeFlags = 0;
 	this->ClearVKChar();
 	this->ClearVKModifiers();
 	this->ClearVKScanCodes();
@@ -66,6 +67,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
+		_localeFlags = 0;
 		this->ClearVKChar();
 		this->ClearVKModifiers();
 		this->ClearVKScanCodes();
@@ -84,6 +86,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
+		_localeFlags = 0;
 		this->ClearVKChar();
 		this->ClearVKModifiers();
 		this->ClearVKScanCodes();
@@ -192,6 +195,13 @@ void CKLL::Fill64()
 		m_vkModifiersArray.insert(m_vkModifiersArray.end(), modifier);
 		++pVkToBit;
 	}
+
+	for(int x = 0; x <= pCharModifiers->wMaxModBits; x++)
+	{
+		std::cout << (int)pCharModifiers->ModNumber[x] << "\n";
+	}
+
+	_localeFlags = KbdTables64->fLocaleFlags;
 
 	// virtual keys to chars with modifieres
 	PVK_TO_WCHAR_TABLE64 pVkToWchTbl = KbdTables64->pVkToWcharTable;
@@ -348,6 +358,11 @@ void CKLL::ClearSCText()
 		delete pVK;
 	}
 	m_scTextArray.clear();
+}
+
+int CKLL::GetLocaleFlags()
+{
+	return _localeFlags;
 }
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);

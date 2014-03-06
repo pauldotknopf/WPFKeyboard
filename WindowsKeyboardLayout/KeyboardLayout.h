@@ -14,11 +14,13 @@ namespace WPFKeyboardNative
 		List<VirtualKey^>^ _virtualKeys;
 		List<ScanCode^>^ _scanCodes;
 		List<ScanCodeText^>^ _scanCodeText;
+		int _localeFlags;
 	public:
-		KeyboardLayout(String^ keyboardLayoutDllPath);
+		KeyboardLayout(String^ keyboardLayoutDllPath, int localeFlags);
 		property List<CharModifier^>^ CharModifiers { List<CharModifier^>^ get (); };
 		property List<VirtualKey^>^ VirtualKeys { List<VirtualKey^>^ get (); };
 		property List<ScanCode^>^ ScanCodes { List<ScanCode^>^ get (); };
 		property List<ScanCodeText^>^ CodeText { List<ScanCodeText^>^ get (); };
+		property int LocaleFlags { int get (); };
 	};
 }

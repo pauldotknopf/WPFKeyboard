@@ -9,7 +9,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	CKLL *kll = new CKLL();
 	// KBDGR - german
 	// KBDUSA - USA
-	kll->LoadDLL("C:\\Windows\\SysWOW64\\KBDUS.DLL");
+	kll->LoadDLL("C:\\Windows\\SysWOW64\\KBDJPN.DLL");
 	Sleep(1000000);
 	return 0;
 }

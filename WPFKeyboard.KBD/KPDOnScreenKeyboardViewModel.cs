@@ -25,7 +25,8 @@ namespace WPFKeyboard
         public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
             var installedInputLanguage = InputLanguage.InstalledInputLanguages.Cast<InputLanguage>().SingleOrDefault(x => x.LayoutName == installedKeyboardLayout.LayoutDisplayName);
-            _keyboardLayout = installedInputLanguage != null ? installedInputLanguage.Handle : NativeMethods.LoadKeyboardLayout(installedKeyboardLayout.Locale, NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
+            //_keyboardLayout = installedInputLanguage != null ? installedInputLanguage.Handle : NativeMethods.LoadKeyboardLayout(installedKeyboardLayout.Locale, NativeMethods.KLF_ACTIVATE | NativeMethods.KLF_SUBSTITUTE_OK);
+            _keyboardLayout = InputLanguage.InstalledInputLanguages[0].Handle;
             BuildKeyboardLayout(KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile)));
         }
 

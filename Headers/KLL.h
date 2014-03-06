@@ -57,6 +57,7 @@ public:
 	int GetScanCodeTextCount();
 	CKLL::SC_TEXT* GetScanCodeTextAtIndex(int index);
 
+	int GetLocaleFlags();
 private:
 	//Our loaded DLL
 	HMODULE hHandle;
@@ -81,4 +82,6 @@ private:
 	void ClearVKScanCodes();
 	std::vector<SC_TEXT*> m_scTextArray;
 	void ClearSCText();
+
+	int _localeFlags;
 };
