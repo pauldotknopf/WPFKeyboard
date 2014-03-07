@@ -57,6 +57,10 @@ public:
 	int GetScanCodeTextCount();
 	CKLL::SC_TEXT* GetScanCodeTextAtIndex(int index);
 
+	int GetModBitsSize();
+	int GetModBitAtIndex(int index);
+
+	int GetLocaleFlags();
 private:
 	//Our loaded DLL
 	HMODULE hHandle;
@@ -73,6 +77,8 @@ private:
 	PKBDTABLES64 KbdTables64;
 	void Fill64();
 
+	void UnloadData();
+
 	std::vector<VK_STRUCT*> m_vkarray;
 	void ClearVKChar();	
 	std::vector<VK_MODIFIER*> m_vkModifiersArray;
@@ -81,4 +87,7 @@ private:
 	void ClearVKScanCodes();
 	std::vector<SC_TEXT*> m_scTextArray;
 	void ClearSCText();
+	std::vector<int> m_modBits;
+	void ClearModBits();
+	int _localeFlags;
 };

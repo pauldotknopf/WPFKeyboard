@@ -14,17 +14,15 @@ namespace WPFKeyboard
         /// <summary>
         /// Occurs when a key is pressed.
         /// </summary>
-        /// <param name="args">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
-        /// <param name="isShifting">True if the shift key (left or right) is pressed.</param>
-        /// <param name="isCapsLockOn">True is caps lock is on.</param>
-        void KeyDown(KeyEventArgs args, bool isShifting, bool isCapsLockOn);
+        /// <param name="args">The <see cref="KeyEventArgs" /> instance containing the event data.</param>
+        /// <param name="modiferState">State of the modifer.</param>
+        void KeyDown(KeyEventArgs args, ModiferState modiferState);
 
         /// <summary>
         /// Occurs when a key is pressed.
         /// </summary>
-        /// <param name="character">The <see cref="KeyPressEventArgs"/> instance containing the event data.</param>
-        /// <param name="isShifting">True if the shift key (left or right) is pressed.</param>
-        /// <param name="isCapsLockOn">True is caps lock is on.</param>
+        /// <param name="character">The <see cref="KeyPressEventArgs" /> instance containing the event data.</param>
+        /// <param name="modiferState">State of the modifer.</param>
         /// <remarks>
         /// Key events occur in the following order:
         /// <list type="number">
@@ -37,14 +35,13 @@ namespace WPFKeyboard
         /// To handle keyboard events only in your application and not enable other applications to receive keyboard events,
         /// set the <see cref="KeyPressEventArgs.Handled" /> property in your form's KeyPress event-handling method to <b>true</b>.
         /// </remarks>
-        void KeyPressed(KeyPressEventArgs character, bool isShifting, bool isCapsLockOn);
+        void KeyPressed(KeyPressEventArgs character, ModiferState modiferState);
 
         /// <summary>
         /// Occurs when a key is released.
         /// </summary>
         /// <param name="args">The <see cref="KeyEventArgs" /> instance containing the event data.</param>
-        /// <param name="isShifting">True if the shift key (left or right) is pressed.</param>
-        /// <param name="isCapsLockOn">True is caps lock is on.</param>
-        void KeyUp(KeyEventArgs args, bool isShifting, bool isCapsLockOn);
+        /// <param name="modiferState">State of the modifer.</param>
+        void KeyUp(KeyEventArgs args, ModiferState modiferState);
     }
 }

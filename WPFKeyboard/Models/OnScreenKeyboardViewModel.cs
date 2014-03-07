@@ -14,5 +14,7 @@ namespace WPFKeyboard.Models
         {
             get { return _sections; }
         }
+
+        public ModiferState ModiferState { get; protected set; }
     }
 }

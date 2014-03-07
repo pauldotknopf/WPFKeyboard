@@ -20,7 +20,9 @@ namespace WPFKeyboard
         /// <param name="kpdFileLocation">The KPD file location.</param>
         public KPDOnScreenKeyboardViewModel(string kpdFileLocation)
         {
-            BuildKeyboardLayout(KeyboardLayoutHelper.GetLayout(kpdFileLocation));
+            var layout = KeyboardLayoutHelper.GetLayout(kpdFileLocation);
+            ModiferState = new ModiferState(layout.CharModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
+            BuildKeyboardLayout(layout);
         }
 
         /// <summary>

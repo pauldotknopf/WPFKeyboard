@@ -13,10 +13,7 @@ CKLL::CKLL(void)
 
 CKLL::~CKLL(void)
 {
-	this->ClearVKChar();
-	this->ClearVKModifiers();
-	this->ClearVKScanCodes();
-	this->ClearSCText();
+	UnloadData();
 	this->UnloadDLL();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -66,10 +63,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
-		this->ClearVKChar();
-		this->ClearVKModifiers();
-		this->ClearVKScanCodes();
-		this->ClearSCText();
+		this->UnloadData();
 		this->Fill32();
 	}
 	else //64-bit
@@ -84,10 +78,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 			return FALSE;
 		}
 
-		this->ClearVKChar();
-		this->ClearVKModifiers();
-		this->ClearVKScanCodes();
-		this->ClearSCText();
+		this->UnloadData();
 		this->Fill64();
 	}
 
@@ -175,11 +166,23 @@ void CKLL::Fill32()
 	//}
 }
 
+void CKLL::UnloadData()
+{
+	_localeFlags = 0;
+	m_vkModifiersArray.clear();
+	this->ClearVKChar();
+	this->ClearVKModifiers();
+	this->ClearVKScanCodes();
+	this->ClearSCText();
+}
+
 void CKLL::Fill64()
 {
 	// if KbdTables64 aren't set, just silent return
 	if(!KbdTables64)
 		return;
+
+	_localeFlags = KbdTables64->fLocaleFlags;
 
 	// modifier keys
 	PMODIFIERS64 pCharModifiers = KbdTables64->pCharMODIFIERS64;
@@ -191,6 +194,12 @@ void CKLL::Fill64()
 		modifier->ModifierBits = pVkToBit->ModBits;
 		m_vkModifiersArray.insert(m_vkModifiersArray.end(), modifier);
 		++pVkToBit;
+	}
+	
+	// modifier bits/combinations
+	for(int x = 0; x <= pCharModifiers->wMaxModBits; x++)
+	{
+		m_modBits.insert(m_modBits.end(), pCharModifiers->ModNumber[x]); 
 	}
 
 	// virtual keys to chars with modifieres
@@ -226,7 +235,7 @@ void CKLL::Fill64()
 		scanCode->ScanCode = i;
 		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
 	}
-	
+
 	PVSC_VK64 E0ScanCodes = KbdTables64->pVSCtoVK_E0;
 	while(E0ScanCodes->Vsc > 0)
 	{
@@ -348,6 +357,21 @@ void CKLL::ClearSCText()
 		delete pVK;
 	}
 	m_scTextArray.clear();
+}
+
+int CKLL::GetModBitsSize()
+{
+	return m_modBits.size();
+}
+
+int CKLL::GetModBitAtIndex(int index)
+{
+	return m_modBits[index];
+}
+
+int CKLL::GetLocaleFlags()
+{
+	return _localeFlags;
 }
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);

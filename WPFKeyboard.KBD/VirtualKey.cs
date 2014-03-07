@@ -28,51 +28,8 @@ namespace WPFKeyboard
             _isAffectedByCapsLock = isAffectedByCapsLock;
             _displayText = displayText;
 
-            for (var x = 0; x < characters.Count; x++)
-            {
-                var character = default(char);
-                var value = characters[x];
-                if (value == Definitions.WCH_DEAD)
-                {
-                    character = ' ';
-                }
-                else if (value == Definitions.WCH_LGTR)
-                {
-                    character = ' ';
-                }
-                else if (value == Definitions.WCH_NONE)
-                {
-                    character = ' ';
-                }
-                else
-                {
-                    character = (char)value;
-                }
-
-                switch (x)
-                {
-                    case 0:
-                        characterBase = character;
-                        break;
-                    case 1:
-                        characterShift = character;
-                        break;
-                    case 2:
-                        characterAltGraphics = character;
-                        break;
-                    case 3:
-                        characterControl = character;
-                        break;
-                    case 4:
-                        characterShiftControl = character;
-                        break;
-                    case 5:
-                        characterShiftAltGraphics = character;
-                        break;
-                }
-            }
-
-            Display = GetDisplayValue(false, false);
+            Display = virtualKey.ToString();
+            //Display = GetDisplayValue(false, false);
         }
 
         public void ButtonDown()
@@ -85,49 +42,50 @@ namespace WPFKeyboard
             Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
         }
 
-        public void KeyDown(System.Windows.Forms.KeyEventArgs args, bool isShifting, bool isCapsLockOn)
+        public void KeyDown(System.Windows.Forms.KeyEventArgs args, ModiferState modifierState)
         {
             if ((int)args.KeyCode == (int)_virtualKey)
             {
                 IsActive = true;
             }
 
-            Display = GetDisplayValue(isShifting, isCapsLockOn);
+            //Display = GetDisplayValue(isShifting, isCapsLockOn);
         }
 
-        public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, bool isShifting, bool isCapsLockOn)
+        public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, ModiferState modifierState)
         {
         }
 
-        public void KeyUp(System.Windows.Forms.KeyEventArgs args, bool isShifting, bool isCapsLockOn)
+        public void KeyUp(System.Windows.Forms.KeyEventArgs args, ModiferState modifierState)
         {
             if ((int)args.KeyCode == (int)_virtualKey)
             {
                 IsActive = false;
             }
 
-            Display = GetDisplayValue(isShifting, isCapsLockOn);
+            //Display = GetDisplayValue(isShifting, isCapsLockOn);
         }
 
         public VirtualKeyCode Key { get { return _virtualKey; } }
 
         private string GetDisplayValue(bool isShift, bool isCapsLockOn)
         {
-            if (!string.IsNullOrEmpty(_displayText))
-                return _displayText;
+            return "";
+            //if (!string.IsNullOrEmpty(_displayText))
+            //    return _displayText;
 
-            if (_characters == null || _characters.Count == 0)
-                return ((VirtualKeyCode)_virtualKey).ToString();
+            //if (_characters == null || _characters.Count == 0)
+            //    return ((VirtualKeyCode)_virtualKey).ToString();
 
-            if (_isAffectedByCapsLock)
-            {
-                if (isCapsLockOn)
-                {
-                    return new string(isShift ? characterBase : characterShift, 1);
-                }
-                return new string(isShift ? characterShift : characterBase, 1);
-            }
-            return new string(isShift ? characterShift : characterBase, 1);
+            //if (_isAffectedByCapsLock)
+            //{
+            //    if (isCapsLockOn)
+            //    {
+            //        return new string(isShift ? characterBase : characterShift, 1);
+            //    }
+            //    return new string(isShift ? characterShift : characterBase, 1);
+            //}
+            //return new string(isShift ? characterShift : characterBase, 1);
         }
     }
 }

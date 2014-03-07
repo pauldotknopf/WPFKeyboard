@@ -12,7 +12,7 @@ namespace Sample
         {
             InitializeComponent();
             VirtualKeyboard.OnScreenKeyControlBuilder = new SampleKeyControlBuilder();
-            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(@"C:\Windows\SysWOW64\KBDUS.DLL");
+            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(@"C:\Windows\SysWOW64\KBDJPN.DLL");
         }
     }
 }

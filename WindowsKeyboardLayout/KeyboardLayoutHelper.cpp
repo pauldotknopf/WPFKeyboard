@@ -21,11 +21,16 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 		if(!result)
 			throw gcnew Exception(String::Format("Unabled to load keyboard layout dll {0}.", keyboardLayoutDll));
 
-		KeyboardLayout^ layout = gcnew KeyboardLayout(keyboardLayoutDll);
+		KeyboardLayout^ layout = gcnew KeyboardLayout(keyboardLayoutDll, kll->GetLocaleFlags());
 
 		for(int i=0;i < kll->GetModifiersCount(); i++)
 		{
 			layout->CharModifiers->Add(gcnew CharModifier(kll->GetModifierAtIndex(i)->VirtualKey, kll->GetModifierAtIndex(i)->ModifierBits));
+		}
+
+		for(int x = 0; x < kll->GetModBitsSize(); x++)
+		{
+			layout->ModifierBits->Add(kll->GetModBitAtIndex(x));
 		}
 
 		for(int i=0;i < kll->GetVKCount(); i++)
