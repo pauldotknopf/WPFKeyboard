@@ -28,6 +28,11 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 			layout->CharModifiers->Add(gcnew CharModifier(kll->GetModifierAtIndex(i)->VirtualKey, kll->GetModifierAtIndex(i)->ModifierBits));
 		}
 
+		for(int x = 0; x < kll->GetModBitsSize(); x++)
+		{
+			layout->ModifierBits->Add(kll->GetModBitAtIndex(x));
+		}
+
 		for(int i=0;i < kll->GetVKCount(); i++)
 		{
 			CKLL::VK_STRUCT *vk = kll->GetVKAtIndex(i);

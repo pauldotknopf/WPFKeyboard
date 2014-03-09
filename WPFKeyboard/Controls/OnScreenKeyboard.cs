@@ -162,8 +162,8 @@ namespace WPFKeyboard.Controls
                             if (!isShifting.HasValue)
                             {
                                 isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
-                                if (args.KeyCode == Keys.Shift 
-                                    || args.KeyCode == Keys.LShiftKey 
+                                if (args.KeyCode == Keys.Shift
+                                    || args.KeyCode == Keys.LShiftKey
                                     || args.KeyCode == Keys.RShiftKey)
                                     isShifting = false;
                             }
@@ -176,7 +176,7 @@ namespace WPFKeyboard.Controls
             }
         }
 
-        private void OnKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs args)
+        private void OnKeyPress(object sender, KeyPressEventArgs args)
         {
             //PrintState();
             bool? isShifting = null;

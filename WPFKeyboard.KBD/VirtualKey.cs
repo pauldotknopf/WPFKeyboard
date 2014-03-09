@@ -25,6 +25,8 @@ namespace WPFKeyboard
             _displayText = displayText;
             _isAffectedByCapsLock = isAffectedByCapsLock;
 
+            Display = virtualKey.ToString();
+            //Display = GetDisplayValue(false, false);
             Display = GetDisplayValue(modifierState);
         }
 
