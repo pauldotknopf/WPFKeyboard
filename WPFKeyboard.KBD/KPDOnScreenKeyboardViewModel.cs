@@ -37,65 +37,6 @@ namespace WPFKeyboard
         /// <param name="keyboardLayout">The keyboard layout.</param>
         public void BuildKeyboardLayout(KeyboardLayout keyboardLayout)
         {
-            ModiferState = new ModiferState(keyboardLayout.CharModifiers.Select(x => (VirtualKeyCode)x.VirtualKey).ToList());
-            //var sb = new StringBuilder();
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("CharModifiers");
-            //sb.AppendLine("---------");
-            //foreach (var charModifier in keyboardLayout.CharModifiers)
-            //{
-            //    sb.AppendLine(string.Format("ModifierBits:{0}:VirtualKey:{1}", charModifier.ModifierBits,
-            //        charModifier.VirtualKey));
-            //}
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodeText");
-            //sb.AppendLine("---------");
-            //foreach (var scanCodeText in keyboardLayout.CodeText)
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:Text:{1}", scanCodeText.ScanCode,
-            //        scanCodeText.Text));
-            //}
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => !x.E0Set && !x.E1Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes E0");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E0Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes E1");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E1Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
-
-            //sb.AppendLine("---------");
-            //sb.AppendLine("VirtualKeys");
-            //sb.AppendLine("---------");
-            //foreach (var virtualkey in keyboardLayout.VirtualKeys)
-            //{
-            //    sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}:Characters:{2}", virtualkey.Key,
-            //        virtualkey.Attributes, string.Join(" - ", virtualkey.Characters.Select(x => string.Format("{0:X}", x)))));
-            //}
-
-            //var result = sb.ToString();
-
             var mainSection = new OnScreenKeyboardSectionViewModel();
             mainSection.Rows.Add(BuildRow1(keyboardLayout));
             mainSection.Rows.Add(BuildRow2(keyboardLayout));
@@ -189,6 +130,19 @@ namespace WPFKeyboard
             row.Keys.Add(KeyForScanCode(0x5B, layout, isE0: true)); // left windows
             row.Keys.Add(KeyForScanCode(0x38, layout));             // left alt
             row.Keys.Add(KeyForScanCode(0x39, layout, 45));         // space bar
+            // we need to add modifier keys that aren't in the normal scancodes
+            foreach (var modifierKey in layout.CharModifiers)
+            {
+                if (modifierKey.VirtualKey != (int) VirtualKeyCode.SHIFT
+                    && modifierKey.VirtualKey != (int) VirtualKeyCode.CONTROL
+                    && modifierKey.VirtualKey != (int) VirtualKeyCode.MENU)
+                {
+                    row.Keys.Add(new VirtualKey((VirtualKeyCode)modifierKey.VirtualKey, _keyboardLayout, null, ModiferState, false)
+                    {
+                        ButtonWidth = new GridLength(10, GridUnitType.Star)
+                    });
+                }
+            }
             row.Keys.Add(KeyForScanCode(0x38, layout, isE0: true)); // right alt
             row.Keys.Add(KeyForScanCode(0x5C, layout, isE0: true)); // right windows
             row.Keys.Add(KeyForScanCode(0x5D, layout, isE0: true)); // menu
