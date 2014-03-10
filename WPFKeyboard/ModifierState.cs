@@ -58,9 +58,9 @@ namespace WPFKeyboard
             }
         }
 
-        public IEnumerable<VirtualKeyCode> GetVirtualKeys()
+        public Dictionary<int, VirtualKeyCode> GetModifierKeys()
         {
-            return _modifierKeys.Values.ToList();
+            return _modifierKeys;
         }
 
         public int ModifierState { get { return _modifierState; } }

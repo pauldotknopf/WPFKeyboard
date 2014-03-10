@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
@@ -15,13 +16,33 @@ namespace WPFKeyboard
     public class KPDOnScreenKeyboardViewModel : OnScreenKeyboardViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel"/> class.
+        /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel" /> class.
         /// </summary>
-        /// <param name="kpdFileLocation">The KPD file location.</param>
-        public KPDOnScreenKeyboardViewModel(string kpdFileLocation)
+        /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
+        public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
-            var layout = KeyboardLayoutHelper.GetLayout(kpdFileLocation);
-            ModiferState = new ModiferState(layout.CharModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
+            var layout = KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile));
+
+            // lets ignore modifier keys that don't have entries for them
+            var charModifiers = new List<CharModifier>();
+            foreach (var charModifier in layout.CharModifiers)
+            {
+                var found = false;
+                for (var x = 0; x < layout.ModifierBits.Count; x++)
+                {
+                    if (x == 0) continue;
+                    if ((x & charModifier.ModifierBits) == x)
+                    {
+                        // this has a the required bit, but is this marked as an invalid shift state?
+                        if (layout.ModifierBits[x] != 0x0F)
+                            found = true;
+                    }
+                }
+                if(found)
+                    charModifiers.Add(charModifier);
+            }
+
+            ModiferState = new ModiferState(charModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
             BuildKeyboardLayout(layout);
         }
 
@@ -31,63 +52,71 @@ namespace WPFKeyboard
         /// <param name="keyboardLayout">The keyboard layout.</param>
         public void BuildKeyboardLayout(KeyboardLayout keyboardLayout)
         {
-            //var sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("CharModifiers");
-            //sb.AppendLine("---------");
-            //foreach (var charModifier in keyboardLayout.CharModifiers)
-            //{
-            //    sb.AppendLine(string.Format("ModifierBits:{0}:VirtualKey:{1}", charModifier.ModifierBits,
-            //        charModifier.VirtualKey));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("CharModifiers");
+            sb.AppendLine("---------");
+            foreach (var charModifier in keyboardLayout.CharModifiers)
+            {
+                sb.AppendLine(string.Format("ModifierBits:{0}:VirtualKey:{1}", charModifier.ModifierBits,
+                    charModifier.VirtualKey));
+            }
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodeText");
-            //sb.AppendLine("---------");
-            //foreach (var scanCodeText in keyboardLayout.CodeText)
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:Text:{1}", scanCodeText.ScanCode,
-            //        scanCodeText.Text));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("ModBits");
+            sb.AppendLine("---------");
+            foreach (var charModifier in keyboardLayout.ModifierBits)
+            {
+                sb.AppendLine(string.Format("ModifierBits:{0}:Index:{1}", keyboardLayout.ModifierBits.IndexOf(charModifier), charModifier));
+            }
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => !x.E0Set && !x.E1Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("ScanCodeText");
+            sb.AppendLine("---------");
+            foreach (var scanCodeText in keyboardLayout.CodeText)
+            {
+                sb.AppendLine(string.Format("ScanCode:{0:X}:Text:{1}", scanCodeText.ScanCode,
+                    scanCodeText.Text));
+            }
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes E0");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E0Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("ScanCodes");
+            sb.AppendLine("---------");
+            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => !x.E0Set && !x.E1Set))
+            {
+                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
+                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
+            }
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("ScanCodes E1");
-            //sb.AppendLine("---------");
-            //foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E1Set))
-            //{
-            //    sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-            //        scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("ScanCodes E0");
+            sb.AppendLine("---------");
+            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E0Set))
+            {
+                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
+                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
+            }
 
-            //sb.AppendLine("---------");
-            //sb.AppendLine("VirtualKeys");
-            //sb.AppendLine("---------");
-            //foreach (var virtualkey in keyboardLayout.VirtualKeys)
-            //{
-            //    sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}:Characters:{2}", virtualkey.Key,
-            //        virtualkey.Attributes, string.Join(" - ", virtualkey.Characters.Select(x => string.Format("{0:X}", x)))));
-            //}
+            sb.AppendLine("---------");
+            sb.AppendLine("ScanCodes E1");
+            sb.AppendLine("---------");
+            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E1Set))
+            {
+                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
+                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
+            }
 
-            //var result = sb.ToString();
+            sb.AppendLine("---------");
+            sb.AppendLine("VirtualKeys");
+            sb.AppendLine("---------");
+            foreach (var virtualkey in keyboardLayout.VirtualKeys)
+            {
+                sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}:Characters:{2}", virtualkey.Key,
+                    virtualkey.Attributes, string.Join(" - ", virtualkey.Characters.Select(x => string.Format("{0:X}", x)))));
+            }
+
+            var result = sb.ToString();
 
             var mainSection = new OnScreenKeyboardSectionViewModel();
             mainSection.Rows.Add(BuildRow1(keyboardLayout));
@@ -205,7 +234,9 @@ namespace WPFKeyboard
             return new VirtualKey(virtualKey,
                 scanCodeText != null ? scanCodeText.Text : null,
                 virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
-                virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)
+                virtualKeyInfo != null && virtualKeyInfo.Attributes == 1,
+                ModiferState,
+                layout.ModifierBits)
                 {
                     ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)
                 };

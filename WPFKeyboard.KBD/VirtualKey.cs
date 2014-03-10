@@ -10,26 +10,27 @@ namespace WPFKeyboard
         private readonly VirtualKeyCode _virtualKey;
         private readonly List<int> _characters;
         private readonly bool _isAffectedByCapsLock;
+        private readonly List<int> _modBits;
         private readonly string _displayText;
-        private readonly char characterBase;
-        private readonly char characterShift;
-        private readonly char characterAltGraphics;
-        private readonly char characterControl;
-        private readonly char characterShiftControl;
-        private readonly char characterShiftAltGraphics;
+        private const int ShftInvalid = 0x0F;
+        private const int WchNone = 0xF000;
+        private const int WchDead = 0xF001;
+        private const int WchLgtr = 0xF002;
 
         public VirtualKey(VirtualKeyCode virtualKey,
             string displayText,
             List<int> characters,
-            bool isAffectedByCapsLock)
+            bool isAffectedByCapsLock,
+            ModiferState modifierState,
+            List<int> modBits)
         {
             _virtualKey = virtualKey;
             _characters = characters;
             _isAffectedByCapsLock = isAffectedByCapsLock;
+            _modBits = modBits;
             _displayText = displayText;
 
-            Display = virtualKey.ToString();
-            //Display = GetDisplayValue(false, false);
+            Display = GetDisplayValue(modifierState);
         }
 
         public void ButtonDown()
@@ -49,7 +50,8 @@ namespace WPFKeyboard
                 IsActive = true;
             }
 
-            //Display = GetDisplayValue(isShifting, isCapsLockOn);
+
+            Display = GetDisplayValue(modifierState);
         }
 
         public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, ModiferState modifierState)
@@ -63,29 +65,53 @@ namespace WPFKeyboard
                 IsActive = false;
             }
 
-            //Display = GetDisplayValue(isShifting, isCapsLockOn);
+            Display = GetDisplayValue(modifierState);
         }
 
         public VirtualKeyCode Key { get { return _virtualKey; } }
 
-        private string GetDisplayValue(bool isShift, bool isCapsLockOn)
+        private string GetDisplayValue(ModiferState modifierState)
         {
-            return "";
-            //if (!string.IsNullOrEmpty(_displayText))
-            //    return _displayText;
+            if (!string.IsNullOrEmpty(_displayText))
+                return _displayText;
 
-            //if (_characters == null || _characters.Count == 0)
-            //    return ((VirtualKeyCode)_virtualKey).ToString();
+            if (_characters == null || _characters.Count == 0)
+                return _virtualKey.ToString();
 
-            //if (_isAffectedByCapsLock)
-            //{
-            //    if (isCapsLockOn)
-            //    {
-            //        return new string(isShift ? characterBase : characterShift, 1);
-            //    }
-            //    return new string(isShift ? characterShift : characterBase, 1);
-            //}
-            //return new string(isShift ? characterShift : characterBase, 1);
+            var index = _modBits[modifierState.ModifierState];
+
+            if (index == ShftInvalid)
+                return string.Empty;
+
+            var character = WchNone;
+
+            if (index < _characters.Count)
+                character = _characters[index];
+
+            if (character == WchNone)
+            {
+                // slowly remote the modifer bits, starting from the least to most significant bit
+                var state = modifierState.ModifierState;
+                foreach (var modifierKey in modifierState.GetModifierKeys())
+                {
+                    state = state & ~(modifierKey.Key);
+
+                    index = _modBits[state];
+
+                    if(index == ShftInvalid) continue;
+
+                    if (index < _characters.Count)
+                        character = _characters[index];
+                    else
+                        character = WchNone;
+
+                    if(character == WchNone) continue;
+
+                    return ((char)character).ToString();
+                }
+            }
+
+            return ((char) character).ToString();
         }
     }
 }
