@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -15,231 +16,186 @@ namespace WPFKeyboard
     /// </summary>
     public class KPDOnScreenKeyboardViewModel : OnScreenKeyboardViewModel
     {
+        #region Ctor
+
+        KeyboardLayout _keyboardLayout;
+        ReadOnlyCollection<int> _modifierBitsSortedByIndex;
+
+        #endregion
+
+        #region Ctor
+
         /// <summary>
         /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel" /> class.
         /// </summary>
         /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
         public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
-            var layout = KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile));
-
-            // lets ignore modifier keys that don't have entries for them
-            var charModifiers = new List<CharModifier>();
-            foreach (var charModifier in layout.CharModifiers)
-            {
-                var found = false;
-                for (var x = 0; x < layout.ModifierBits.Count; x++)
-                {
-                    if (x == 0) continue;
-                    if ((x & charModifier.ModifierBits) == x)
-                    {
-                        // this has a the required bit, but is this marked as an invalid shift state?
-                        if (layout.ModifierBits[x] != 0x0F)
-                            found = true;
-                    }
-                }
-                if(found)
-                    charModifiers.Add(charModifier);
-            }
-
-            ModiferState = new ModiferState(charModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
-            BuildKeyboardLayout(layout);
+            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile));
+            BuildKeyboardLayout();
         }
 
-        /// <summary>
-        /// Build the keyboard layout based on the given class that represents the KPD file given in the constructor.
-        /// </summary>
-        /// <param name="keyboardLayout">The keyboard layout.</param>
-        public void BuildKeyboardLayout(KeyboardLayout keyboardLayout)
+        #endregion
+
+        #region Properties
+
+        public KeyboardLayout KeyboardLayout
         {
-            var sb = new StringBuilder();
+            get { return _keyboardLayout; }
+        }
 
-            sb.AppendLine("---------");
-            sb.AppendLine("CharModifiers");
-            sb.AppendLine("---------");
-            foreach (var charModifier in keyboardLayout.CharModifiers)
-            {
-                sb.AppendLine(string.Format("ModifierBits:{0}:VirtualKey:{1}", charModifier.ModifierBits,
-                    charModifier.VirtualKey));
-            }
+        public IList<int> ModifierBitsSortedByIndex
+        {
+            get { return _modifierBitsSortedByIndex; }
+        }
 
-            sb.AppendLine("---------");
-            sb.AppendLine("ModBits");
-            sb.AppendLine("---------");
-            foreach (var charModifier in keyboardLayout.ModifierBits)
-            {
-                sb.AppendLine(string.Format("ModifierBits:{0}:Index:{1}", keyboardLayout.ModifierBits.IndexOf(charModifier), charModifier));
-            }
+        #endregion
 
-            sb.AppendLine("---------");
-            sb.AppendLine("ScanCodeText");
-            sb.AppendLine("---------");
-            foreach (var scanCodeText in keyboardLayout.CodeText)
-            {
-                sb.AppendLine(string.Format("ScanCode:{0:X}:Text:{1}", scanCodeText.ScanCode,
-                    scanCodeText.Text));
-            }
+        #region Methods
 
-            sb.AppendLine("---------");
-            sb.AppendLine("ScanCodes");
-            sb.AppendLine("---------");
-            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => !x.E0Set && !x.E1Set))
-            {
-                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            }
+        #region Private
 
-            sb.AppendLine("---------");
-            sb.AppendLine("ScanCodes E0");
-            sb.AppendLine("---------");
-            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E0Set))
-            {
-                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            }
+        private void BuildKeyboardLayout()
+        {
+            _modifierBitsSortedByIndex = new ReadOnlyCollection<int>(KeyboardLayout.ModifierBits
+                .Select(x => new
+                {
+                    ModBits = KeyboardLayout.ModifierBits.IndexOf(x),
+                    Index = x
+                })
+                .Where(x => x.Index != Constants.ShftInvalid)
+                .OrderBy(x => x.Index)
+                .Select(x => x.ModBits)
+                .ToList());
 
-            sb.AppendLine("---------");
-            sb.AppendLine("ScanCodes E1");
-            sb.AppendLine("---------");
-            foreach (var scanCode in keyboardLayout.ScanCodes.Where(x => x.E1Set))
-            {
-                sb.AppendLine(string.Format("ScanCode:{0:X}:VirtualKey:{1}:E0:{2}:E1:{3}", scanCode.Code,
-                    scanCode.VirtualKey, scanCode.E0Set, scanCode.E1Set));
-            }
-
-            sb.AppendLine("---------");
-            sb.AppendLine("VirtualKeys");
-            sb.AppendLine("---------");
-            foreach (var virtualkey in keyboardLayout.VirtualKeys)
-            {
-                sb.AppendLine(string.Format("VirtualKey:{0}:Attributes:{1}:Characters:{2}", virtualkey.Key,
-                    virtualkey.Attributes, string.Join(" - ", virtualkey.Characters.Select(x => string.Format("{0:X}", x)))));
-            }
-
-            var result = sb.ToString();
+            ModiferState = new ModiferState(KeyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
 
             var mainSection = new OnScreenKeyboardSectionViewModel();
-            mainSection.Rows.Add(BuildRow1(keyboardLayout));
-            mainSection.Rows.Add(BuildRow2(keyboardLayout));
-            mainSection.Rows.Add(BuildRow3(keyboardLayout));
-            mainSection.Rows.Add(BuildRow4(keyboardLayout));
-            mainSection.Rows.Add(BuildRow5(keyboardLayout));
+            mainSection.Rows.Add(BuildRow1());
+            mainSection.Rows.Add(BuildRow2());
+            mainSection.Rows.Add(BuildRow3());
+            mainSection.Rows.Add(BuildRow4());
+            mainSection.Rows.Add(BuildRow5());
             Sections.Add(mainSection);
         }
 
-        private OnScreenKeyboardRowViewModel BuildRow1(KeyboardLayout layout)
+        private OnScreenKeyboardRowViewModel BuildRow1()
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x29, layout));             // ~
-            row.Keys.Add(KeyForScanCode(0x02, layout));             // 1
-            row.Keys.Add(KeyForScanCode(0x03, layout));             // 2
-            row.Keys.Add(KeyForScanCode(0x04, layout));             // 3
-            row.Keys.Add(KeyForScanCode(0x05, layout));             // 4
-            row.Keys.Add(KeyForScanCode(0x06, layout));             // 5 
-            row.Keys.Add(KeyForScanCode(0x07, layout));             // 6
-            row.Keys.Add(KeyForScanCode(0x08, layout));             // 7
-            row.Keys.Add(KeyForScanCode(0x09, layout));             // 8
-            row.Keys.Add(KeyForScanCode(0x0A, layout));             // 9
-            row.Keys.Add(KeyForScanCode(0x0B, layout));             // 0
-            row.Keys.Add(KeyForScanCode(0x0C, layout));             // -
-            row.Keys.Add(KeyForScanCode(0x0D, layout));             // +
-            row.Keys.Add(KeyForScanCode(0x0E, layout, 20));         // backspace
+            row.Keys.Add(KeyForScanCode(0x29));             // ~
+            row.Keys.Add(KeyForScanCode(0x02));             // 1
+            row.Keys.Add(KeyForScanCode(0x03));             // 2
+            row.Keys.Add(KeyForScanCode(0x04));             // 3
+            row.Keys.Add(KeyForScanCode(0x05));             // 4
+            row.Keys.Add(KeyForScanCode(0x06));             // 5 
+            row.Keys.Add(KeyForScanCode(0x07));             // 6
+            row.Keys.Add(KeyForScanCode(0x08));             // 7
+            row.Keys.Add(KeyForScanCode(0x09));             // 8
+            row.Keys.Add(KeyForScanCode(0x0A));             // 9
+            row.Keys.Add(KeyForScanCode(0x0B));             // 0
+            row.Keys.Add(KeyForScanCode(0x0C));             // -
+            row.Keys.Add(KeyForScanCode(0x0D));             // +
+            row.Keys.Add(KeyForScanCode(0x0E, 20));         // backspace
             return row;
         }
 
-        private OnScreenKeyboardRowViewModel BuildRow2(KeyboardLayout layout)
+        private OnScreenKeyboardRowViewModel BuildRow2()
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x0F, layout, 15));         // tab
-            row.Keys.Add(KeyForScanCode(0x10, layout));             // Q
-            row.Keys.Add(KeyForScanCode(0x11, layout));             // W
-            row.Keys.Add(KeyForScanCode(0x12, layout));             // E
-            row.Keys.Add(KeyForScanCode(0x13, layout));             // R
-            row.Keys.Add(KeyForScanCode(0x14, layout));             // T
-            row.Keys.Add(KeyForScanCode(0x15, layout));             // Y
-            row.Keys.Add(KeyForScanCode(0x16, layout));             // U
-            row.Keys.Add(KeyForScanCode(0x17, layout));             // I
-            row.Keys.Add(KeyForScanCode(0x18, layout));             // O
-            row.Keys.Add(KeyForScanCode(0x19, layout));             // P
-            row.Keys.Add(KeyForScanCode(0x1A, layout));             // [
-            row.Keys.Add(KeyForScanCode(0x1B, layout));             // ]
-            row.Keys.Add(KeyForScanCode(0x2B, layout, 15));         // \
+            row.Keys.Add(KeyForScanCode(0x0F, 15));         // tab
+            row.Keys.Add(KeyForScanCode(0x10));             // Q
+            row.Keys.Add(KeyForScanCode(0x11));             // W
+            row.Keys.Add(KeyForScanCode(0x12));             // E
+            row.Keys.Add(KeyForScanCode(0x13));             // R
+            row.Keys.Add(KeyForScanCode(0x14));             // T
+            row.Keys.Add(KeyForScanCode(0x15));             // Y
+            row.Keys.Add(KeyForScanCode(0x16));             // U
+            row.Keys.Add(KeyForScanCode(0x17));             // I
+            row.Keys.Add(KeyForScanCode(0x18));             // O
+            row.Keys.Add(KeyForScanCode(0x19));             // P
+            row.Keys.Add(KeyForScanCode(0x1A));             // [
+            row.Keys.Add(KeyForScanCode(0x1B));             // ]
+            row.Keys.Add(KeyForScanCode(0x2B, 15));         // \
             return row;
         }
 
-        private OnScreenKeyboardRowViewModel BuildRow3(KeyboardLayout layout)
+        private OnScreenKeyboardRowViewModel BuildRow3()
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x3A, layout, 17));         // caps lock
-            row.Keys.Add(KeyForScanCode(0x1E, layout));             // A
-            row.Keys.Add(KeyForScanCode(0x1F, layout));             // S
-            row.Keys.Add(KeyForScanCode(0x20, layout));             // D
-            row.Keys.Add(KeyForScanCode(0x21, layout));             // F
-            row.Keys.Add(KeyForScanCode(0x22, layout));             // G
-            row.Keys.Add(KeyForScanCode(0x23, layout));             // H
-            row.Keys.Add(KeyForScanCode(0x24, layout));             // J
-            row.Keys.Add(KeyForScanCode(0x25, layout));             // K
-            row.Keys.Add(KeyForScanCode(0x26, layout));             // L
-            row.Keys.Add(KeyForScanCode(0x27, layout));             // ;
-            row.Keys.Add(KeyForScanCode(0x28, layout));             // '
-            row.Keys.Add(KeyForScanCode(0x1C, layout, 21));         // enter
+            row.Keys.Add(KeyForScanCode(0x3A, 17));         // caps lock
+            row.Keys.Add(KeyForScanCode(0x1E));             // A
+            row.Keys.Add(KeyForScanCode(0x1F));             // S
+            row.Keys.Add(KeyForScanCode(0x20));             // D
+            row.Keys.Add(KeyForScanCode(0x21));             // F
+            row.Keys.Add(KeyForScanCode(0x22));             // G
+            row.Keys.Add(KeyForScanCode(0x23));             // H
+            row.Keys.Add(KeyForScanCode(0x24));             // J
+            row.Keys.Add(KeyForScanCode(0x25));             // K
+            row.Keys.Add(KeyForScanCode(0x26));             // L
+            row.Keys.Add(KeyForScanCode(0x27));             // ;
+            row.Keys.Add(KeyForScanCode(0x28));             // '
+            row.Keys.Add(KeyForScanCode(0x1C, 21));         // enter
             return row;
         }
 
-        private OnScreenKeyboardRowViewModel BuildRow4(KeyboardLayout layout)
+        private OnScreenKeyboardRowViewModel BuildRow4()
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x2A, layout, 21));         // left shift
-            row.Keys.Add(KeyForScanCode(0x2C, layout));             // Z
-            row.Keys.Add(KeyForScanCode(0x2D, layout));             // X
-            row.Keys.Add(KeyForScanCode(0x2E, layout));             // C
-            row.Keys.Add(KeyForScanCode(0x2F, layout));             // V
-            row.Keys.Add(KeyForScanCode(0x30, layout));             // B
-            row.Keys.Add(KeyForScanCode(0x31, layout));             // N
-            row.Keys.Add(KeyForScanCode(0x32, layout));             // M
-            row.Keys.Add(KeyForScanCode(0x33, layout));             // ,
-            row.Keys.Add(KeyForScanCode(0x34, layout));             // .
-            row.Keys.Add(KeyForScanCode(0x35, layout));             // /
-            row.Keys.Add(KeyForScanCode(0x36, layout, 21));         // right shift
+            row.Keys.Add(KeyForScanCode(0x2A, 21));         // left shift
+            row.Keys.Add(KeyForScanCode(0x2C));             // Z
+            row.Keys.Add(KeyForScanCode(0x2D));             // X
+            row.Keys.Add(KeyForScanCode(0x2E));             // C
+            row.Keys.Add(KeyForScanCode(0x2F));             // V
+            row.Keys.Add(KeyForScanCode(0x30));             // B
+            row.Keys.Add(KeyForScanCode(0x31));             // N
+            row.Keys.Add(KeyForScanCode(0x32));             // M
+            row.Keys.Add(KeyForScanCode(0x33));             // ,
+            row.Keys.Add(KeyForScanCode(0x34));             // .
+            row.Keys.Add(KeyForScanCode(0x35));             // /
+            row.Keys.Add(KeyForScanCode(0x36, 21));         // right shift
             return row;
         }
 
-        private OnScreenKeyboardRowViewModel BuildRow5(KeyboardLayout layout)
+        private OnScreenKeyboardRowViewModel BuildRow5()
         {
             var row = new OnScreenKeyboardRowViewModel();
-            row.Keys.Add(KeyForScanCode(0x1D, layout));             // right control
-            row.Keys.Add(KeyForScanCode(0x5B, layout, isE0: true)); // left windows
-            row.Keys.Add(KeyForScanCode(0x38, layout));             // left alt
-            row.Keys.Add(KeyForScanCode(0x39, layout, 45));         // space bar
-            row.Keys.Add(KeyForScanCode(0x38, layout, isE0: true)); // right alt
-            row.Keys.Add(KeyForScanCode(0x5C, layout, isE0: true)); // right windows
-            row.Keys.Add(KeyForScanCode(0x5D, layout, isE0: true)); // menu
-            row.Keys.Add(KeyForScanCode(0x1D, layout, isE0: true)); // right control
+            row.Keys.Add(KeyForScanCode(0x1D));             // right control
+            row.Keys.Add(KeyForScanCode(0x5B, isE0: true)); // left windows
+            row.Keys.Add(KeyForScanCode(0x38));             // left alt
+            row.Keys.Add(KeyForScanCode(0x39, 45));         // space bar
+            row.Keys.Add(KeyForScanCode(0x38, isE0: true)); // right alt
+            row.Keys.Add(KeyForScanCode(0x5C, isE0: true)); // right windows
+            row.Keys.Add(KeyForScanCode(0x5D, isE0: true)); // menu
+            row.Keys.Add(KeyForScanCode(0x1D, isE0: true)); // right control
             return row;
         }
 
-        private BaseOnScreenKeyViewModel KeyForScanCode(int scanCode, KeyboardLayout layout, int widthWeight = 10, bool isE0 = false, bool isE1 = false)
+        private BaseOnScreenKeyViewModel KeyForScanCode(int scanCode, int widthWeight = 10, bool isE0 = false, bool isE1 = false)
         {
-            var sc = layout.ScanCodes.FirstOrDefault(x => x.Code == scanCode && x.E0Set == isE0 && x.E1Set == isE1);
+            var sc = KeyboardLayout.ScanCodes.FirstOrDefault(x => x.Code == scanCode && x.E0Set == isE0 && x.E1Set == isE1);
 
             if (sc == null)
                 throw new Exception(string.Format("The scan code {0:X} isn't valid.", scanCode));
 
             var virtualKey = (VirtualKeyCode)(sc.VirtualKey & 0xFF);
 
-            var virtualKeyInfo = layout.VirtualKeys.SingleOrDefault(x => x.Key == sc.VirtualKey);
+            var virtualKeyInfo = KeyboardLayout.VirtualKeys.SingleOrDefault(x => x.Key == sc.VirtualKey);
 
-            var scanCodeText = layout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
+            var scanCodeText = KeyboardLayout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
 
-            return new VirtualKey(virtualKey,
+            return new VirtualKey(
+                this,
+                virtualKey,
                 scanCodeText != null ? scanCodeText.Text : null,
                 virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
-                virtualKeyInfo != null && virtualKeyInfo.Attributes == 1,
-                ModiferState,
-                layout.ModifierBits)
+                virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)
                 {
                     ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)
                 };
         }
+
+        #endregion
+
+        #endregion
     }
 }

@@ -141,13 +141,8 @@ namespace WPFKeyboard.Controls
             Keyboard.KeyUp -= OnKeyUp;
         }
 
-        private void OnKeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
+        private void OnKeyUp(object sender, KeyEventArgs args)
         {
-            Debug.WriteLine((int)args.KeyCode);
-            //PrintState();
-            bool? isShifting = null;
-            bool? isCapsLockOn = null;
-
             if (_viewModel.ModiferState != null)
                 _viewModel.ModiferState.Refresh((VirtualKeyCode)args.KeyCode);
 
@@ -159,16 +154,6 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            if (!isShifting.HasValue)
-                            {
-                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
-                                if (args.KeyCode == Keys.Shift
-                                    || args.KeyCode == Keys.LShiftKey
-                                    || args.KeyCode == Keys.RShiftKey)
-                                    isShifting = false;
-                            }
-                            if (!isCapsLockOn.HasValue)
-                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
                             (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferState);
                         }
                     }
@@ -178,10 +163,6 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyPress(object sender, KeyPressEventArgs args)
         {
-            //PrintState();
-            bool? isShifting = null;
-            bool? isCapsLockOn = null;
-
             if (_viewModel.ModiferState != null)
                 _viewModel.ModiferState.Refresh();
 
@@ -193,10 +174,6 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            if (!isShifting.HasValue)
-                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
-                            if (!isCapsLockOn.HasValue)
-                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
                             (key as IKeyEventListener).KeyPressed(args, _viewModel.ModiferState);
                         }
                     }
@@ -204,12 +181,8 @@ namespace WPFKeyboard.Controls
             }
         }
 
-        private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
+        private void OnKeyDown(object sender, KeyEventArgs args)
         {
-            //PrintState();
-            bool? isShifting = null;
-            bool? isCapsLockOn = null;
-
             if (_viewModel.ModiferState != null)
                 _viewModel.ModiferState.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
 
@@ -221,29 +194,11 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            if (!isShifting.HasValue)
-                            {
-                                isShifting = Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT);
-                                if (args.KeyCode == Keys.Shift
-                                    || args.KeyCode == Keys.LShiftKey
-                                    || args.KeyCode == Keys.RShiftKey)
-                                    isShifting = true;
-                            }
-                            if (!isCapsLockOn.HasValue)
-                                isCapsLockOn = Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL);
                             (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferState);
                         }
                     }
                 }
             }
-        }
-
-        private void PrintState()
-        {
-            Debug.WriteLine("IsKeyDown(VirtualKeyCode.SHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.SHIFT));
-            Debug.WriteLine("IsKeyDown(VirtualKeyCode.RSHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.RSHIFT));
-            Debug.WriteLine("IsKeyDown(VirtualKeyCode.LSHIFT) == {0}", Keyboard.InputDeviceStateAdapter.IsKeyDown(VirtualKeyCode.LSHIFT));
-            Debug.WriteLine("IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL) == {0}", Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(VirtualKeyCode.CAPITAL));
         }
 
         #endregion

@@ -1,4 +1,8 @@
-﻿using Sample.KeyTemplates;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Windows.Documents;
+using Sample.KeyTemplates;
 using WPFKeyboard;
 
 namespace Sample

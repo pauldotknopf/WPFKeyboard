@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq.Expressions;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
 using WPFKeyboardNative;
@@ -7,30 +11,25 @@ namespace WPFKeyboard
 {
     public class VirtualKey : BaseOnScreenKeyViewModel, IButtonEventListener, IKeyEventListener
     {
+        private readonly KPDOnScreenKeyboardViewModel _viewModel;
         private readonly VirtualKeyCode _virtualKey;
         private readonly List<int> _characters;
         private readonly bool _isAffectedByCapsLock;
-        private readonly List<int> _modBits;
         private readonly string _displayText;
-        private const int ShftInvalid = 0x0F;
-        private const int WchNone = 0xF000;
-        private const int WchDead = 0xF001;
-        private const int WchLgtr = 0xF002;
-
-        public VirtualKey(VirtualKeyCode virtualKey,
+        
+        public VirtualKey(KPDOnScreenKeyboardViewModel viewModel, 
+            VirtualKeyCode virtualKey,
             string displayText,
             List<int> characters,
-            bool isAffectedByCapsLock,
-            ModiferState modifierState,
-            List<int> modBits)
+            bool isAffectedByCapsLock)
         {
+            _viewModel = viewModel;
             _virtualKey = virtualKey;
             _characters = characters;
             _isAffectedByCapsLock = isAffectedByCapsLock;
-            _modBits = modBits;
             _displayText = displayText;
 
-            Display = GetDisplayValue(modifierState);
+            Display = GetDisplayValue(_viewModel.ModiferState);
         }
 
         public void ButtonDown()
@@ -49,7 +48,6 @@ namespace WPFKeyboard
             {
                 IsActive = true;
             }
-
 
             Display = GetDisplayValue(modifierState);
         }
@@ -78,40 +76,34 @@ namespace WPFKeyboard
             if (_characters == null || _characters.Count == 0)
                 return _virtualKey.ToString();
 
-            var index = _modBits[modifierState.ModifierState];
+            var index = _viewModel.KeyboardLayout.ModifierBits[Math.Min(modifierState.ModifierState, _viewModel.KeyboardLayout.ModifierBits.Count - 1)];
 
-            if (index == ShftInvalid)
-                return string.Empty;
+            var character = CharacterAtIndex(index);
 
-            var character = WchNone;
-
-            if (index < _characters.Count)
-                character = _characters[index];
-
-            if (character == WchNone)
+            while (character == Constants.WchNone || CharUnicodeInfo.GetUnicodeCategory((char)character) == UnicodeCategory.Control)
             {
-                // slowly remote the modifer bits, starting from the least to most significant bit
-                var state = modifierState.ModifierState;
-                foreach (var modifierKey in modifierState.GetModifierKeys())
+                if (index == 0)
                 {
-                    state = state & ~(modifierKey.Key);
-
-                    index = _modBits[state];
-
-                    if(index == ShftInvalid) continue;
-
-                    if (index < _characters.Count)
-                        character = _characters[index];
-                    else
-                        character = WchNone;
-
-                    if(character == WchNone) continue;
-
-                    return ((char)character).ToString();
+                    character = CharacterAtIndex(index);
+                    break;
                 }
+                index--;
+                // make sure this index has a combination of bits that are in our current modifications tate
+                if ((_viewModel.ModifierBitsSortedByIndex[index] & modifierState.ModifierState) ==
+                    modifierState.ModifierState)
+                    character = CharacterAtIndex(index);
+                else
+                    character = Constants.WchNone;
             }
 
-            return ((char) character).ToString();
+            return ((char)character).ToString();
+        }
+
+        private int CharacterAtIndex(int index)
+        {
+            if (_characters.Count < index + 1)
+                return Constants.WchNone;
+            return _characters[index];
         }
     }
 }
