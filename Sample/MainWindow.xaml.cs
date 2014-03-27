@@ -16,7 +16,7 @@ namespace Sample
         {
             InitializeComponent();
             VirtualKeyboard.OnScreenKeyControlBuilder = new SampleKeyControlBuilder();
-            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(KeyboardHelper.InstalledKeyboardLayouts["German"]);
+            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(KeyboardHelper.InstalledKeyboardLayouts["US"]);
         }
     }
 }

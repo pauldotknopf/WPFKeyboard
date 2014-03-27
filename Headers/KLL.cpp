@@ -9,6 +9,7 @@ CKLL::CKLL(void)
 	hHandle = NULL;
 	KbdTables = NULL;
 	KbdTables64 = NULL;
+	std::cout << "Is64BitWindows=" << Is64BitWindows() << "\n";
 }
 
 CKLL::~CKLL(void)
@@ -23,7 +24,7 @@ CKLL::~CKLL(void)
 // Manages 32 and 64-bit system, when running a 32-bit app
 BOOL CKLL::LoadDLL(char* sKeyboardDll )
 {
-	std::cout << "64bit\n";
+	std::cout << "LoadDLL...  " << sKeyboardDll << "\n";
 
 	//Unload if loaded...
 	if(hHandle)
@@ -32,9 +33,10 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 	//Load the dll as usual
 	//TRACE(L"Loading Keyboard DLL %ws\n", sKeyboardDll);
 	hHandle = LoadLibraryA(sKeyboardDll);
+
 	if (!hHandle)
 	{
-		//AfxMessageBox(L"Failed to load dll " + sKeyboardDll);
+		std::cout << "Failed to load DLL...\n";
 		this->UnloadDLL();
 		return FALSE;
 	}
@@ -45,7 +47,7 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 	//Return if error
 	if(!pfnKbdLayerDescriptor)
 	{
-		//AfxMessageBox(L"Could not load kbdLayerDescriptor, is it a real keyboard layout file?");
+		std::cout << "Could not load kbdLayerDescriptor, is it a real keyboard layout file?";
 		this->UnloadDLL();
 		return FALSE;
 	}
@@ -53,6 +55,8 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 	//Get the keyboard descriptor export and set table
 	if(!Is64BitWindows()) //32-bit
 	{
+		std::cout << "Detected 32bit...\n";
+
 		//Init the tables
 		KbdTables = (PKBDTABLES)pfnKbdLayerDescriptor();
 
@@ -68,6 +72,8 @@ BOOL CKLL::LoadDLL(char* sKeyboardDll )
 	}
 	else //64-bit
 	{
+		std::cout << "Detected 64bit...\n";
+
 		//Init the tables
 		KbdTables64 = (PKBDTABLES64)pfnKbdLayerDescriptor();
 
@@ -102,68 +108,93 @@ void CKLL::Fill32()
 {
 	std::cout << "32bit\n";
 
-	//If KbdTables aren't set, just silent return
+	// if KbdTables64 aren't set, just silent return
 	if(!KbdTables)
 		return;
 
-	///*
-	//* Modifier keys
-	//*/
-	//PMODIFIERS pCharModifiers = KbdTables->pCharModifiers;
-	//PVK_TO_BIT pVkToBit = pCharModifiers->pVkToBit;
-	//while (pVkToBit->Vk)
-	//{
-	//	std::cout << "VkToBit " << pVkToBit->Vk << " -> " << pVkToBit->ModBits << "\n";
-	//	++pVkToBit;
-	//}
+	_localeFlags = KbdTables->fLocaleFlags;
 
-	////Handle all the chars with modifieres
-	//PVK_TO_WCHAR_TABLE pVkToWchTbl = KbdTables->pVkToWcharTable;
-	//while (pVkToWchTbl->pVkToWchars)
-	//{
-	//	PVK_TO_WCHARS1 pVkToWch = pVkToWchTbl->pVkToWchars;
-	//	while (pVkToWch->VirtualKey)
-	//	{
-	//		VK_STRUCT *pVK = new VK_STRUCT();
-	//		pVK->nVK = pVkToWch->VirtualKey;
-	//		pVK->attributes = pVkToWch->Attributes;
+	// modifier keys
+	PMODIFIERS pCharModifiers = KbdTables->pCharModifiers;
+	PVK_TO_BIT pVkToBit = pCharModifiers->pVkToBit;
+	while (pVkToBit->Vk)
+	{
+		VK_MODIFIER *modifier = new VK_MODIFIER();
+		modifier->VirtualKey = pVkToBit->Vk;
+		modifier->ModifierBits = pVkToBit->ModBits;
+		m_vkModifiersArray.insert(m_vkModifiersArray.end(), modifier);
+		++pVkToBit;
+	}
+	
+	// modifier bits/combinations
+	for(int x = 0; x <= pCharModifiers->wMaxModBits; x++)
+	{
+		m_modBits.insert(m_modBits.end(), pCharModifiers->ModNumber[x]); 
+	}
 
-	//		for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
-	//		{
-	//			pVK->aChar.insert(pVK->aChar.end(), pVkToWch->wch[i]);
-	//		}
-	//		m_vkarray.insert(m_vkarray.end(), pVK);
+	// virtual keys to chars with modifieres
+	PVK_TO_WCHAR_TABLE pVkToWchTbl = KbdTables->pVkToWcharTable;
+	while (pVkToWchTbl->pVkToWchars)
+	{
+		PVK_TO_WCHARS1 pVkToWch = pVkToWchTbl->pVkToWchars;
+		while (pVkToWch->VirtualKey)
+		{
+			VK_STRUCT *pVK = new VK_STRUCT();
+			pVK->VirtualKey = (int)pVkToWch->VirtualKey;
+			pVK->Attributes = pVkToWch->Attributes;
 
-	//		pVkToWch = (PVK_TO_WCHARS1)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
-	//	}
-	//	++pVkToWchTbl;
-	//}
+			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
+			{
+				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
+			}
+			m_vkarray.insert(m_vkarray.end(), pVK);
 
-	////If KbdTables aren't set, just silent return
-	//if(!KbdTables)
-	//	return;
+			pVkToWch = (PVK_TO_WCHARS1)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
+		}
+		++pVkToWchTbl;
+	}
 
-	////Fill all the SC into VKs array
-	//for (int i = 0; i < KbdTables->bMaxVSCtoVK; i++)
-	//	this->AddVKSC(KbdTables->pusVSCtoVK[i], i);
+	// virtual key scan codes
+	for(int i = 0; i < KbdTables->bMaxVSCtoVK; i++ ) 
+	{
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->VirtualKey = KbdTables->pusVSCtoVK[i];
+		scanCode->ScanCode = i;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+	}
 
-	////Handle all the chars with modifieres
-	//PVK_TO_WCHAR_TABLE pVkToWchTbl = KbdTables->pVkToWcharTable;
-	//while (pVkToWchTbl->pVkToWchars)
-	//{
-	//	PVK_TO_WCHARS1 pVkToWch = pVkToWchTbl->pVkToWchars;
-	//	while (pVkToWch->VirtualKey)
-	//	{
-	//		for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
-	//		{
-	//			sChar.Format(L"%wc (%.4x)", pVkToWch->wch[i], pVkToWch->wch[i]);
-	//			this->AddVKChar(pVkToWch->VirtualKey, sChar);
-	//		}
+	PVSC_VK E0ScanCodes = KbdTables->pVSCtoVK_E0;
+	while(E0ScanCodes->Vsc > 0)
+	{
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->VirtualKey = E0ScanCodes->Vk;
+		scanCode->ScanCode = E0ScanCodes->Vsc;
+		scanCode->E0Set = true;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+		E0ScanCodes++;
+	}
 
-	//		pVkToWch = (PVK_TO_WCHARS1)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
-	//	}
-	//	++pVkToWchTbl;
-	//}
+	PVSC_VK E1ScanCodes = KbdTables->pVSCtoVK_E1;
+	while(E1ScanCodes->Vsc > 0)
+	{
+		VK_SCANCODE *scanCode = new VK_SCANCODE();
+		scanCode->VirtualKey = E1ScanCodes->Vk;
+		scanCode->ScanCode = E1ScanCodes->Vsc;
+		scanCode->E1Set = true;
+		m_vkScanCodesArray.insert(m_vkScanCodesArray.end(), scanCode);
+		E1ScanCodes++;
+	}
+
+	// virtual key text
+	PVSC_LPWSTR keyNames = KbdTables->pKeyNames;
+	while(keyNames->vsc)
+	{
+		SC_TEXT *scanCodeText = new SC_TEXT();
+		scanCodeText->ScanCode = keyNames->vsc;
+		scanCodeText->Text = keyNames->pwsz;
+		m_scTextArray.insert(m_scTextArray.end(), scanCodeText);
+		keyNames++;
+	}
 }
 
 void CKLL::UnloadData()
@@ -268,13 +299,6 @@ void CKLL::Fill64()
 		m_scTextArray.insert(m_scTextArray.end(), scanCodeText);
 		keyNames++;
 	}
-
-	///*PDEADKEY64 pDEADKEY64 = KbdTables64->pDEADKEY64;
-	//int count = 0;
-	//while(pDEADKEY64){
-	//count++;
-	//pDEADKEY64++;
-	//}*/
 }
 
 int CKLL::GetVKCount()

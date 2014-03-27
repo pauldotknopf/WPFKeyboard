@@ -31,7 +31,9 @@ namespace WPFKeyboard
         /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
         public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
         {
-            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(@"C:\Windows\SysWOW64\{0}", installedKeyboardLayout.LayoutFile));
+            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
+                ? @"C:\Windows\SysWOW64\{0}"
+                : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
             BuildKeyboardLayout();
         }
 
