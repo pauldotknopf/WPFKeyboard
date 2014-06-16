@@ -13,6 +13,7 @@ namespace WPFKeyboard.Controls
     public class OnScreenKey : Button
     {
         readonly OnScreenKeyboard _onScreenKeyboard;
+        private bool _isActive;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OnScreenKey"/> class.
@@ -25,8 +26,11 @@ namespace WPFKeyboard.Controls
             SetBinding(IsActiveProperty, new Binding("IsActive"));
             SetBinding(StyleProperty, new Binding("OnScreenKeyStyle") { Source = _onScreenKeyboard });
             PreviewMouseDown += OnMouseDown;
-            Click += OnClick;
+            PreviewMouseUp += OnPreviewMouseUp;
+            IsMouseDirectlyOverChanged += OnIsMouseDirectlyOverChanged;
         }
+
+        
 
         #region Properties
 
@@ -55,15 +59,40 @@ namespace WPFKeyboard.Controls
         #region Events
 
         /// <summary>
-        /// This is raised when the button is released/clicked
+        /// Raised when the user leaves the button.
+        /// This is used to detect if the user has pressed the button, but slide the mouse out so that the "up" event never gets raised, leaving a key pressed continously.
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="routedEventArgs"></param>
-        private void OnClick(object sender, RoutedEventArgs routedEventArgs)
+        /// <param name="e"></param>
+        private void OnIsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var buttonEvent = DataContext as IButtonEventListener;
-            if (buttonEvent != null)
-                buttonEvent.ButtonUp();
+            if(!IsMouseDirectlyOver && _isActive)
+            {
+                _isActive = false;
+                var buttonEvent = DataContext as IButtonEventListener;
+                if (buttonEvent != null)
+                    buttonEvent.ButtonUp();
+                if (ViewModel != null)
+                    ViewModel.IsActive = false;
+            }
+        }
+
+        /// <summary>
+        /// Raised when the user clicks the mouse up
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="mouseButtonEventArgs"></param>
+        private void OnPreviewMouseUp(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            if (_isActive)
+            {
+                _isActive = false;
+                var buttonEvent = DataContext as IButtonEventListener;
+                if (buttonEvent != null)
+                    buttonEvent.ButtonUp();
+                if (ViewModel != null)
+                    ViewModel.IsActive = false;
+            }
         }
 
         /// <summary>
@@ -73,9 +102,15 @@ namespace WPFKeyboard.Controls
         /// <param name="mouseButtonEventArgs"></param>
         private void OnMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
-            var buttonEvent = DataContext as IButtonEventListener;
-            if (buttonEvent != null)
-                buttonEvent.ButtonDown();
+            if (!_isActive)
+            {
+                _isActive = true;
+                var buttonEvent = DataContext as IButtonEventListener;
+                if (buttonEvent != null)
+                    buttonEvent.ButtonDown();
+                if (ViewModel != null)
+                    ViewModel.IsActive = true;
+            }
         }
 
         /// <summary>
