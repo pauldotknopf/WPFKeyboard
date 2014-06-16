@@ -240,7 +240,6 @@ void CKLL::Fill64()
 		PVK_TO_WCHARS641 pVkToWch = pVkToWchTbl->pVkToWchars;
 		while (pVkToWch->VirtualKey)
 		{
-			printf("Virtual Key: %d\n", pVkToWch->VirtualKey);
 			VK_STRUCT *pVK = new VK_STRUCT();
 			pVK->VirtualKey = (int)pVkToWch->VirtualKey;
 			pVK->Attributes = pVkToWch->Attributes;
@@ -248,7 +247,6 @@ void CKLL::Fill64()
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
 				//std::wcout << "Char: " << pVkToWch->wch[i] << "\n";
-				printf("Char: %d\n", pVkToWch->wch[i]);
 				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);
