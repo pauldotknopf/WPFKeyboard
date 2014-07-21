@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq.Expressions;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
-using WPFKeyboardNative;
 
 namespace WPFKeyboard
 {
@@ -15,9 +12,12 @@ namespace WPFKeyboard
         private readonly VirtualKeyCode _virtualKey;
         private readonly List<int> _characters;
         private readonly bool _isAffectedByCapsLock;
+        private readonly bool _isStickyKey;
+        private bool _isStickyKeyDuplicateDown;
+        private bool _isVirtualButtonPress;
         private readonly string _displayText;
-        
-        public VirtualKey(KPDOnScreenKeyboardViewModel viewModel, 
+
+        public VirtualKey(KPDOnScreenKeyboardViewModel viewModel,
             VirtualKeyCode virtualKey,
             string displayText,
             List<int> characters,
@@ -27,40 +27,79 @@ namespace WPFKeyboard
             _virtualKey = virtualKey;
             _characters = characters;
             _isAffectedByCapsLock = isAffectedByCapsLock;
+            if (_virtualKey == VirtualKeyCode.LSHIFT || _virtualKey == VirtualKeyCode.LCONTROL || _virtualKey == VirtualKeyCode.LMENU
+                || _virtualKey == VirtualKeyCode.RSHIFT || _virtualKey == VirtualKeyCode.RCONTROL || _virtualKey == VirtualKeyCode.RMENU)
+                _isStickyKey = true;
             _displayText = displayText;
 
-            Display = GetDisplayValue(_viewModel.ModiferState);
+            Display = GetDisplayValue(_viewModel.ModiferStateManager);
         }
 
+        /// <summary>
+        /// The button was pressed down
+        /// </summary>
         public void ButtonDown()
         {
-            Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
+            _isVirtualButtonPress = true;
+            if (!_viewModel.IsStickyKeyHeld || _isStickyKey)
+                Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
+            else
+            {
+                Keyboard.Simulator.Keyboard.KeyDown(_viewModel.StickyVirtualKeyCode);
+                Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
+                Keyboard.Simulator.Keyboard.KeyUp(_viewModel.StickyVirtualKeyCode);
+                _viewModel.IsStickyKeyHeld = false;
+            }
         }
 
         public void ButtonUp()
         {
             Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
+            _isVirtualButtonPress = false;
         }
 
-        public void KeyDown(System.Windows.Forms.KeyEventArgs args, ModiferState modifierState)
+        public void KeyDown(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState)
         {
             if ((int)args.KeyCode == (int)_virtualKey)
             {
+                if (_isVirtualButtonPress)
+                {
+                    if (_isStickyKey && !_isStickyKeyDuplicateDown)
+                    {
+                        Console.WriteLine("_isStickyKey");
+                        _viewModel.IsStickyKeyHeld = !_viewModel.IsStickyKeyHeld;
+                        _viewModel.StickyVirtualKeyCode = _virtualKey;
+                    }
+                    else if (_isStickyKeyDuplicateDown)
+                    {
+                        _isStickyKeyDuplicateDown = false;
+                    }
+                }
                 IsActive = true;
             }
-
             Display = GetDisplayValue(modifierState);
         }
 
-        public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, ModiferState modifierState)
+        public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, IModiferStateManager modifierState)
         {
         }
 
-        public void KeyUp(System.Windows.Forms.KeyEventArgs args, ModiferState modifierState)
+        public void KeyUp(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState)
         {
             if ((int)args.KeyCode == (int)_virtualKey)
             {
-                IsActive = false;
+                if (_isStickyKey && _isVirtualButtonPress)
+                {
+                    if (!_viewModel.IsStickyKeyHeld)
+                        IsActive = false;
+                    else
+                    {
+                        _isStickyKeyDuplicateDown = true;
+                        Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
+                    }
+                }
+                else
+                    IsActive = false;
             }
 
             Display = GetDisplayValue(modifierState);
@@ -68,7 +107,7 @@ namespace WPFKeyboard
 
         public VirtualKeyCode Key { get { return _virtualKey; } }
 
-        private string GetDisplayValue(ModiferState modifierState)
+        private string GetDisplayValue(IModiferStateManager modifierState)
         {
             if (!string.IsNullOrEmpty(_displayText))
                 return _displayText;
@@ -104,6 +143,11 @@ namespace WPFKeyboard
             if (_characters.Count < index + 1)
                 return Constants.WchNone;
             return _characters[index];
+        }
+
+        public override void UpdateDisplay(IModiferStateManager modiferStateManager)
+        {
+            Display = GetDisplayValue(modiferStateManager);
         }
     }
 }

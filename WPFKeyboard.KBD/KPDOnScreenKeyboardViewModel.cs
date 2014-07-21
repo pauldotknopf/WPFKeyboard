@@ -29,8 +29,10 @@ namespace WPFKeyboard
         /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel" /> class.
         /// </summary>
         /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
-        public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout)
+        /// <param name="modiferStateManager">The modifer state manager.</param>
+        public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout, IModiferStateManager modiferStateManager)
         {
+            ModiferStateManager = modiferStateManager;
             _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
                 ? @"C:\Windows\SysWOW64\{0}"
                 : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
@@ -69,8 +71,6 @@ namespace WPFKeyboard
                 .OrderBy(x => x.Index)
                 .Select(x => x.ModBits)
                 .ToList());
-
-            ModiferState = new ModiferState(KeyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits, x => (VirtualKeyCode)x.VirtualKey));
 
             var mainSection = new OnScreenKeyboardSectionViewModel();
             mainSection.Rows.Add(BuildRow1());

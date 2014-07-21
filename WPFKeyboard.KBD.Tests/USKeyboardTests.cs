@@ -15,25 +15,19 @@ namespace WPFKeyboard.KBD.Tests
         {
             var virtualKey = GetVirtualKeyModel(VirtualKeyCode.VK_E);
 
-            using (new ModificationSession())
-            {
-                Assert.That(virtualKey.Display, Is.EqualTo("e"));
-            }
+            Assert.That(virtualKey.Display, Is.EqualTo("e"));
 
-            using (new ModificationSession(VirtualKeyCode.SHIFT))
-            {
-                Assert.That(virtualKey.Display, Is.EqualTo("E"));
-            }
+            SimulateModiferKeys(VirtualKeyCode.SHIFT);
+            virtualKey.UpdateDisplay(_modifierStateManager.Object);
+            Assert.That(virtualKey.Display, Is.EqualTo("E"));
 
-            using (new ModificationSession(VirtualKeyCode.CONTROL))
-            {
-                Assert.That(virtualKey.Display, Is.EqualTo("e"));
-            }
+            SimulateModiferKeys(VirtualKeyCode.CONTROL);
+            virtualKey.UpdateDisplay(_modifierStateManager.Object);
+            Assert.That(virtualKey.Display, Is.EqualTo("e"));
 
-            using (new ModificationSession(VirtualKeyCode.MENU))
-            {
-                Assert.That(virtualKey.Display, Is.EqualTo("e"));
-            }
+            SimulateModiferKeys(VirtualKeyCode.MENU);
+            virtualKey.UpdateDisplay(_modifierStateManager.Object);
+            Assert.That(virtualKey.Display, Is.EqualTo("e"));
         }
 
         public override InstalledKeyboardLayout GetKeyboardLayout()

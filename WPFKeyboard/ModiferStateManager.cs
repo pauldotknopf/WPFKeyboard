@@ -5,15 +5,15 @@ using WindowsInput.Native;
 
 namespace WPFKeyboard
 {
-    public class ModiferState
+    public class ModiferStateManager : IModiferStateManager
     {
-        private readonly Dictionary<int, VirtualKeyCode> _modifierKeys = new Dictionary<int, VirtualKeyCode>();
-        private readonly Dictionary<int, bool> _state;
-        private int _modifierState = 0;
+        private Dictionary<int, VirtualKeyCode> _modifierKeys = new Dictionary<int, VirtualKeyCode>();
+        private Dictionary<int, bool> _state;
+        private int _modifierState;
 
-        public ModiferState(Dictionary<int, VirtualKeyCode> modifierKeys)
+        public void SetModifierKeys(Dictionary<int, VirtualKeyCode> modifierKeys)
         {
-            if (modifierKeys == null) throw new ArgumentNullException("modifierKeys");
+            if(modifierKeys == null) throw new ArgumentNullException("modifierKeys");
             _modifierKeys = modifierKeys;
             _state = new Dictionary<int, bool>();
             foreach (var bit in _modifierKeys.Keys)
@@ -23,6 +23,8 @@ namespace WPFKeyboard
 
         public void Refresh(VirtualKeyCode? keyUp = null, VirtualKeyCode? keyDown = null)
         {
+            if(_modifierKeys == null) return;
+
             foreach (var bit in _modifierKeys.Keys.ToList())
             {
                 var virtualKey = _modifierKeys[bit];
@@ -56,11 +58,6 @@ namespace WPFKeyboard
             {
                 _modifierState |= bit;
             }
-        }
-
-        public Dictionary<int, VirtualKeyCode> GetModifierKeys()
-        {
-            return _modifierKeys;
         }
 
         public int ModifierState { get { return _modifierState; } }

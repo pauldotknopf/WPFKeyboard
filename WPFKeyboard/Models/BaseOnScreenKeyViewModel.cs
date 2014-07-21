@@ -41,5 +41,7 @@ namespace WPFKeyboard.Models
                 RaisePropertyChanged("IsActive");
             }
         }
+
+        public abstract void UpdateDisplay(IModiferStateManager modiferStateManager);
     }
 }

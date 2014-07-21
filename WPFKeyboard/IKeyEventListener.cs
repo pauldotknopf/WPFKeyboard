@@ -16,7 +16,7 @@ namespace WPFKeyboard
         /// </summary>
         /// <param name="args">The <see cref="KeyEventArgs" /> instance containing the event data.</param>
         /// <param name="modiferState">State of the modifer.</param>
-        void KeyDown(KeyEventArgs args, ModiferState modiferState);
+        void KeyDown(KeyEventArgs args, IModiferStateManager modiferState);
 
         /// <summary>
         /// Occurs when a key is pressed.
@@ -35,13 +35,13 @@ namespace WPFKeyboard
         /// To handle keyboard events only in your application and not enable other applications to receive keyboard events,
         /// set the <see cref="KeyPressEventArgs.Handled" /> property in your form's KeyPress event-handling method to <b>true</b>.
         /// </remarks>
-        void KeyPressed(KeyPressEventArgs character, ModiferState modiferState);
+        void KeyPressed(KeyPressEventArgs character, IModiferStateManager modiferState);
 
         /// <summary>
         /// Occurs when a key is released.
         /// </summary>
         /// <param name="args">The <see cref="KeyEventArgs" /> instance containing the event data.</param>
         /// <param name="modiferState">State of the modifer.</param>
-        void KeyUp(KeyEventArgs args, ModiferState modiferState);
+        void KeyUp(KeyEventArgs args, IModiferStateManager modiferState);
     }
 }

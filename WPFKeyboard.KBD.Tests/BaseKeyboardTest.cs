@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Moq;
+using NUnit.Framework;
+using System;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using WindowsInput.Native;
-using NUnit.Framework;
+using WPFKeyboardNative;
 
 namespace WPFKeyboard.KBD.Tests
 {
@@ -13,74 +14,31 @@ namespace WPFKeyboard.KBD.Tests
     {
 // ReSharper disable InconsistentNaming
         protected KPDOnScreenKeyboardViewModel _viewModel;
+        protected Mock<IModiferStateManager> _modifierStateManager;
+        protected KeyboardLayout _keyboardLayout;
+        protected Dictionary<VirtualKeyCode, int> _modifierKeys;
 // ReSharper restore InconsistentNaming
 
         [SetUp]
         public void Setup()
         {
-            if (IntPtr.Size == 4)
-            {
-                // 32-bit
-            }
-            else if (IntPtr.Size == 8)
-            {
-                // 64-bit
-            }
-            else
-            {
-                // The future is now!
-            }
-
-            _viewModel = new KPDOnScreenKeyboardViewModel(GetKeyboardLayout());
-            Keyboard.KeyDown += OnKeyDown;
-            Keyboard.KeyUp += OnKeyUp;
+            _modifierStateManager = new Mock<IModiferStateManager>();
+            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
+               ? @"C:\Windows\SysWOW64\{0}"
+               : @"C:\Windows\System32\{0}", GetKeyboardLayout().LayoutFile));
+            _modifierKeys = _keyboardLayout.CharModifiers.ToDictionary(x => (VirtualKeyCode) x.VirtualKey,
+                x => x.ModifierBits);
+            _viewModel = new KPDOnScreenKeyboardViewModel(GetKeyboardLayout(), _modifierStateManager.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Keyboard.KeyDown -= OnKeyDown;
-            Keyboard.KeyUp -= OnKeyUp;
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs args)
+        protected void SimulateModiferKeys(params VirtualKeyCode[] modiferKeys)
         {
-            if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
-
-            foreach (var section in _viewModel.Sections)
-            {
-                foreach (var row in section.Rows)
-                {
-                    foreach (var key in row.Keys)
-                    {
-                        if (key is IKeyEventListener)
-                        {
-                            (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferState);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs args)
-        {
-            if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh((VirtualKeyCode)args.KeyCode);
-
-            foreach (var section in _viewModel.Sections)
-            {
-                foreach (var row in section.Rows)
-                {
-                    foreach (var key in row.Keys)
-                    {
-                        if (key is IKeyEventListener)
-                        {
-                            (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferState);
-                        }
-                    }
-                }
-            }
+            _modifierStateManager.Setup(x => x.ModifierState).Returns(modiferKeys.Aggregate(0, (current, key) => current | _modifierKeys[key]));
         }
 
         public abstract InstalledKeyboardLayout GetKeyboardLayout();

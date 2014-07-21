@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using WindowsInput.Native;
 
 namespace WPFKeyboard.Models
 {
@@ -15,6 +16,10 @@ namespace WPFKeyboard.Models
             get { return _sections; }
         }
 
-        public ModiferState ModiferState { get; protected set; }
+        public IModiferStateManager ModiferStateManager { get; protected set; }
+
+        public bool IsStickyKeyHeld { get; set; }
+
+        public VirtualKeyCode StickyVirtualKeyCode { get; set; }
     }
 }

@@ -143,8 +143,8 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyUp(object sender, KeyEventArgs args)
         {
-            if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh((VirtualKeyCode)args.KeyCode);
+            if (_viewModel.ModiferStateManager != null)
+                _viewModel.ModiferStateManager.Refresh((VirtualKeyCode)args.KeyCode);
 
             foreach (var section in _viewModel.Sections)
             {
@@ -154,7 +154,7 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferState);
+                            (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferStateManager);
                         }
                     }
                 }
@@ -163,8 +163,8 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyPress(object sender, KeyPressEventArgs args)
         {
-            if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh();
+            if (_viewModel.ModiferStateManager != null)
+                _viewModel.ModiferStateManager.Refresh();
 
             foreach (var section in _viewModel.Sections)
             {
@@ -174,7 +174,7 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            (key as IKeyEventListener).KeyPressed(args, _viewModel.ModiferState);
+                            (key as IKeyEventListener).KeyPressed(args, _viewModel.ModiferStateManager);
                         }
                     }
                 }
@@ -183,8 +183,8 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyDown(object sender, KeyEventArgs args)
         {
-            if (_viewModel.ModiferState != null)
-                _viewModel.ModiferState.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
+            if (_viewModel.ModiferStateManager != null)
+                _viewModel.ModiferStateManager.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
 
             foreach (var section in _viewModel.Sections)
             {
@@ -194,7 +194,7 @@ namespace WPFKeyboard.Controls
                     {
                         if (key is IKeyEventListener)
                         {
-                            (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferState);
+                            (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferStateManager);
                         }
                     }
                 }

@@ -72,8 +72,6 @@ namespace WPFKeyboard.Controls
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
                     buttonEvent.ButtonUp();
-                if (ViewModel != null)
-                    ViewModel.IsActive = false;
             }
         }
 
@@ -90,8 +88,6 @@ namespace WPFKeyboard.Controls
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
                     buttonEvent.ButtonUp();
-                if (ViewModel != null)
-                    ViewModel.IsActive = false;
             }
         }
 
@@ -108,8 +104,6 @@ namespace WPFKeyboard.Controls
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
                     buttonEvent.ButtonDown();
-                if (ViewModel != null)
-                    ViewModel.IsActive = true;
             }
         }
 
@@ -121,15 +115,6 @@ namespace WPFKeyboard.Controls
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             Content = ViewModel != null ? _onScreenKeyboard.BuildContentControlForKey(ViewModel) : null;
-        }
-
-        protected override void OnIsPressedChanged(DependencyPropertyChangedEventArgs e)
-        {
-            base.OnIsPressedChanged(e);
-            if (ViewModel != null)
-            {
-                ViewModel.IsActive = IsPressed;
-            }
         }
 
         #endregion

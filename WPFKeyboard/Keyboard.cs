@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MouseKeyboardActivityMonitor;
+using MouseKeyboardActivityMonitor.WinApi;
 using System.Windows.Forms;
 using WindowsInput;
-using MouseKeyboardActivityMonitor;
-using MouseKeyboardActivityMonitor.WinApi;
 
 namespace WPFKeyboard
 {
@@ -28,8 +24,7 @@ namespace WPFKeyboard
             {
                 if (_keyboardHookListener == null)
                 {
-                    _keyboardHookListener = new KeyboardHookListener(new GlobalHooker());
-                    _keyboardHookListener.Enabled = true;
+                    _keyboardHookListener = new KeyboardHookListener(new GlobalHooker()) {Enabled = true};
                 }
             }
         }
