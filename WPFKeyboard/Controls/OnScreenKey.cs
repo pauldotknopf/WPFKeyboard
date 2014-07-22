@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -30,7 +29,7 @@ namespace WPFKeyboard.Controls
             IsMouseDirectlyOverChanged += OnIsMouseDirectlyOverChanged;
         }
 
-        
+
 
         #region Properties
 
@@ -66,12 +65,16 @@ namespace WPFKeyboard.Controls
         /// <param name="e"></param>
         private void OnIsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if(!IsMouseDirectlyOver && _isActive)
+            if (!IsMouseDirectlyOver && _isActive)
             {
                 _isActive = false;
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
+                {
+                    _onScreenKeyboard.IsVirtual = true;
                     buttonEvent.ButtonUp();
+                    _onScreenKeyboard.IsVirtual = false;
+                }
             }
         }
 
@@ -87,7 +90,11 @@ namespace WPFKeyboard.Controls
                 _isActive = false;
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
+                {
+                    _onScreenKeyboard.IsVirtual = true;
                     buttonEvent.ButtonUp();
+                    _onScreenKeyboard.IsVirtual = false;
+                }
             }
         }
 
@@ -103,7 +110,11 @@ namespace WPFKeyboard.Controls
                 _isActive = true;
                 var buttonEvent = DataContext as IButtonEventListener;
                 if (buttonEvent != null)
+                {
+                    _onScreenKeyboard.IsVirtual = true;
                     buttonEvent.ButtonDown();
+                    _onScreenKeyboard.IsVirtual = false;
+                }
             }
         }
 

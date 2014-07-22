@@ -1,7 +1,5 @@
 ﻿using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -23,6 +21,8 @@ namespace WPFKeyboard.Controls
         }
 
         #region Properties
+
+        public bool IsVirtual;
 
         /// <summary>
         /// See OnScreenKeyStyle
@@ -129,7 +129,6 @@ namespace WPFKeyboard.Controls
         {
             if (Helpers.IsInDesignMode) return;
             Keyboard.KeyDown += OnKeyDown;
-            Keyboard.KeyPress += OnKeyPress;
             Keyboard.KeyUp += OnKeyUp;
         }
 
@@ -137,7 +136,6 @@ namespace WPFKeyboard.Controls
         {
             if (Helpers.IsInDesignMode) return;
             Keyboard.KeyDown -= OnKeyDown;
-            Keyboard.KeyPress -= OnKeyPress;
             Keyboard.KeyUp -= OnKeyUp;
         }
 
@@ -146,39 +144,8 @@ namespace WPFKeyboard.Controls
             if (_viewModel.ModiferStateManager != null)
                 _viewModel.ModiferStateManager.Refresh((VirtualKeyCode)args.KeyCode);
 
-            foreach (var section in _viewModel.Sections)
-            {
-                foreach (var row in section.Rows)
-                {
-                    foreach (var key in row.Keys)
-                    {
-                        if (key is IKeyEventListener)
-                        {
-                            (key as IKeyEventListener).KeyUp(args, _viewModel.ModiferStateManager);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void OnKeyPress(object sender, KeyPressEventArgs args)
-        {
-            if (_viewModel.ModiferStateManager != null)
-                _viewModel.ModiferStateManager.Refresh();
-
-            foreach (var section in _viewModel.Sections)
-            {
-                foreach (var row in section.Rows)
-                {
-                    foreach (var key in row.Keys)
-                    {
-                        if (key is IKeyEventListener)
-                        {
-                            (key as IKeyEventListener).KeyPressed(args, _viewModel.ModiferStateManager);
-                        }
-                    }
-                }
-            }
+            foreach (var key in _viewModel.Sections.SelectMany(section => section.Rows.SelectMany(row => row.Keys.OfType<IKeyEventListener>())))
+                key.KeyUp(args, _viewModel.ModiferStateManager, IsVirtual);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs args)
@@ -186,19 +153,8 @@ namespace WPFKeyboard.Controls
             if (_viewModel.ModiferStateManager != null)
                 _viewModel.ModiferStateManager.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
 
-            foreach (var section in _viewModel.Sections)
-            {
-                foreach (var row in section.Rows)
-                {
-                    foreach (var key in row.Keys)
-                    {
-                        if (key is IKeyEventListener)
-                        {
-                            (key as IKeyEventListener).KeyDown(args, _viewModel.ModiferStateManager);
-                        }
-                    }
-                }
-            }
+            foreach (var key in (from section in _viewModel.Sections from row in section.Rows from key in row.Keys select key).OfType<IKeyEventListener>())
+                key.KeyDown(args, _viewModel.ModiferStateManager, IsVirtual);
         }
 
         #endregion

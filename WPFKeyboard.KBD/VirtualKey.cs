@@ -13,8 +13,7 @@ namespace WPFKeyboard
         private readonly List<int> _characters;
         private readonly bool _isAffectedByCapsLock;
         private readonly bool _isStickyKey;
-        private bool _isStickyKeyDuplicateDown;
-        private bool _isVirtualButtonPress;
+        private bool _isStickyEnabled;
         private readonly string _displayText;
 
         public VirtualKey(KPDOnScreenKeyboardViewModel viewModel,
@@ -27,9 +26,7 @@ namespace WPFKeyboard
             _virtualKey = virtualKey;
             _characters = characters;
             _isAffectedByCapsLock = isAffectedByCapsLock;
-            if (_virtualKey == VirtualKeyCode.LSHIFT || _virtualKey == VirtualKeyCode.LCONTROL || _virtualKey == VirtualKeyCode.LMENU
-                || _virtualKey == VirtualKeyCode.RSHIFT || _virtualKey == VirtualKeyCode.RCONTROL || _virtualKey == VirtualKeyCode.RMENU)
-                _isStickyKey = true;
+            _isStickyKey = IsAStickyKey(_virtualKey);
             _displayText = displayText;
 
             Display = GetDisplayValue(_viewModel.ModiferStateManager);
@@ -40,69 +37,79 @@ namespace WPFKeyboard
         /// </summary>
         public void ButtonDown()
         {
-            _isVirtualButtonPress = true;
-            if (!_viewModel.IsStickyKeyHeld || _isStickyKey)
-                Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
-            else
-            {
-                Keyboard.Simulator.Keyboard.KeyDown(_viewModel.StickyVirtualKeyCode);
-                Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
-                Keyboard.Simulator.Keyboard.KeyUp(_viewModel.StickyVirtualKeyCode);
-                _viewModel.IsStickyKeyHeld = false;
-            }
+            if (_isStickyKey)
+                _isStickyEnabled = !_isStickyEnabled;
+            Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
         }
 
         public void ButtonUp()
         {
-            Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
-            _isVirtualButtonPress = false;
+            if (!_isStickyKey || (_isStickyKey && !_isStickyEnabled))
+                Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
         }
 
-        public void KeyDown(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState)
+        public void KeyDown(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState, bool isVirtual)
         {
             if ((int)args.KeyCode == (int)_virtualKey)
             {
-                if (_isVirtualButtonPress)
-                {
-                    if (_isStickyKey && !_isStickyKeyDuplicateDown)
-                    {
-                        Console.WriteLine("_isStickyKey");
-                        _viewModel.IsStickyKeyHeld = !_viewModel.IsStickyKeyHeld;
-                        _viewModel.StickyVirtualKeyCode = _virtualKey;
-                    }
-                    else if (_isStickyKeyDuplicateDown)
-                    {
-                        _isStickyKeyDuplicateDown = false;
-                    }
-                }
                 IsActive = true;
             }
             Display = GetDisplayValue(modifierState);
         }
 
-        public void KeyPressed(System.Windows.Forms.KeyPressEventArgs character, IModiferStateManager modifierState)
+        public void KeyUp(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState, bool isVirtual)
         {
-        }
-
-        public void KeyUp(System.Windows.Forms.KeyEventArgs args, IModiferStateManager modifierState)
-        {
-            if ((int)args.KeyCode == (int)_virtualKey)
+            if (IsActive)
             {
-                if (_isStickyKey && _isVirtualButtonPress)
+                var isActualKeyPressedAndNotLooping = (int)args.KeyCode == (int)_virtualKey;
+                var isNonStickyKeyPressed = !IsAStickyKey((int)args.KeyCode);
+                var isActualKeyPressedASticky = isActualKeyPressedAndNotLooping &&
+                                               IsAStickyKey((VirtualKeyCode)args.KeyCode);
+                if ((_isStickyKey && _isStickyEnabled) && ((isVirtual && isActualKeyPressedASticky) || (!isVirtual && isActualKeyPressedAndNotLooping)
+                    || (isActualKeyPressedAndNotLooping) || (!isVirtual) || (isNonStickyKeyPressed)))
                 {
-                    if (!_viewModel.IsStickyKeyHeld)
-                        IsActive = false;
-                    else
+                    IsActive = false;
+                    // Turn _isStickyEnabled to false and fire a KeyUp so that the key isn't 'held' down anymore
+                    _isStickyEnabled = false;
+                    Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
+                }
+                else if (_isStickyKey && !_isStickyEnabled && isVirtual && isActualKeyPressedAndNotLooping)
+                {
+                    IsActive = false;
+                    // Turn _isStickyEnabled to false and fire a KeyUp so that the key isn't 'held' down anymore
+                    _isStickyEnabled = false;
+                    Keyboard.Simulator.Keyboard.KeyUp(_virtualKey);
+                }
+                else if (!isVirtual && isActualKeyPressedAndNotLooping)
+                {
+                    // This is for hardware keys being pressed
+                    IsActive = false;
+                    if (_isStickyKey && _isStickyEnabled)
                     {
-                        _isStickyKeyDuplicateDown = true;
-                        Keyboard.Simulator.Keyboard.KeyDown(_virtualKey);
+                        // If an on-screen sticky was toggled, need to turn off _isStickyEnabled if they hit the hardware sticky key
+                        _isStickyEnabled = false;
                     }
                 }
-                else
+                else if (isVirtual && !_isStickyKey &&
+                         isActualKeyPressedAndNotLooping)
+                {
+                    // This is a generic on-screen key press that isn't a sticky
                     IsActive = false;
+                }
             }
-
             Display = GetDisplayValue(modifierState);
+        }
+
+        private bool IsAStickyKey(VirtualKeyCode code)
+        {
+            return code == VirtualKeyCode.LSHIFT || code == VirtualKeyCode.LMENU || code == VirtualKeyCode.LCONTROL ||
+                   code == VirtualKeyCode.RSHIFT || code == VirtualKeyCode.RMENU || code == VirtualKeyCode.RCONTROL;
+        }
+
+        private bool IsAStickyKey(int code)
+        {
+            return code == (int)VirtualKeyCode.LSHIFT || code == (int)VirtualKeyCode.LMENU || code == (int)VirtualKeyCode.LCONTROL ||
+                    code == (int)VirtualKeyCode.RSHIFT || code == (int)VirtualKeyCode.RMENU || code == (int)VirtualKeyCode.RCONTROL;
         }
 
         public VirtualKeyCode Key { get { return _virtualKey; } }
@@ -128,11 +135,8 @@ namespace WPFKeyboard
                 }
                 index--;
                 // make sure this index has a combination of bits that are in our current modifications tate
-                if ((_viewModel.ModifierBitsSortedByIndex[index] & modifierState.ModifierState) ==
-                    modifierState.ModifierState)
-                    character = CharacterAtIndex(index);
-                else
-                    character = Constants.WchNone;
+                character = (_viewModel.ModifierBitsSortedByIndex[index] & modifierState.ModifierState) ==
+                            modifierState.ModifierState ? CharacterAtIndex(index) : Constants.WchNone;
             }
 
             return ((char)character).ToString();

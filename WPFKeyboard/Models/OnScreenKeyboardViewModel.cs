@@ -17,9 +17,5 @@ namespace WPFKeyboard.Models
         }
 
         public IModiferStateManager ModiferStateManager { get; protected set; }
-
-        public bool IsStickyKeyHeld { get; set; }
-
-        public VirtualKeyCode StickyVirtualKeyCode { get; set; }
     }
 }

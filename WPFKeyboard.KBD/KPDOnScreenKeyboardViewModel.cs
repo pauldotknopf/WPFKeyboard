@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
@@ -32,10 +31,13 @@ namespace WPFKeyboard
         /// <param name="modiferStateManager">The modifer state manager.</param>
         public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout, IModiferStateManager modiferStateManager)
         {
-            ModiferStateManager = modiferStateManager;
             _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
                 ? @"C:\Windows\SysWOW64\{0}"
                 : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
+            ModiferStateManager = modiferStateManager;
+            modiferStateManager.SetModifierKeys(_keyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits,
+                x => (VirtualKeyCode)x.VirtualKey));
+
             BuildKeyboardLayout();
         }
 
@@ -184,6 +186,7 @@ namespace WPFKeyboard
             var virtualKeyInfo = KeyboardLayout.VirtualKeys.SingleOrDefault(x => x.Key == sc.VirtualKey);
 
             var scanCodeText = KeyboardLayout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
+
 
             return new VirtualKey(
                 this,

@@ -7,7 +7,7 @@ namespace WPFKeyboard
 {
     public class ModiferStateManager : IModiferStateManager
     {
-        private Dictionary<int, VirtualKeyCode> _modifierKeys = new Dictionary<int, VirtualKeyCode>();
+        private Dictionary<int, VirtualKeyCode> _modifierKeys;
         private Dictionary<int, bool> _state;
         private int _modifierState;
 
@@ -58,6 +58,8 @@ namespace WPFKeyboard
             {
                 _modifierState |= bit;
             }
+
+            // TODO: If caps is pressed or toggled, toggle shift bit
         }
 
         public int ModifierState { get { return _modifierState; } }

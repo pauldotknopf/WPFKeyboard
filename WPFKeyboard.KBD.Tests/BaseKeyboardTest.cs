@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using WindowsInput.Native;
 using WPFKeyboardNative;
 
