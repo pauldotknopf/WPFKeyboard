@@ -65,6 +65,7 @@ namespace WPFKeyboard
                 var isNonStickyKeyPressed = !IsAStickyKey((int)args.KeyCode);
                 var isActualKeyPressedASticky = isActualKeyPressedAndNotLooping &&
                                                IsAStickyKey((VirtualKeyCode)args.KeyCode);
+
                 if ((_isStickyKey && _isStickyEnabled) && ((isVirtual && isActualKeyPressedASticky) || (!isVirtual && isActualKeyPressedAndNotLooping)
                     || (isActualKeyPressedAndNotLooping) || (!isVirtual) || (isNonStickyKeyPressed)))
                 {
@@ -97,6 +98,7 @@ namespace WPFKeyboard
                     IsActive = false;
                 }
             }
+
             Display = GetDisplayValue(modifierState);
         }
 
@@ -122,7 +124,42 @@ namespace WPFKeyboard
             if (_characters == null || _characters.Count == 0)
                 return _virtualKey.ToString();
 
-            var index = _viewModel.KeyboardLayout.ModifierBits[Math.Min(modifierState.ModifierState, _viewModel.KeyboardLayout.ModifierBits.Count - 1)];
+            var modState = modifierState.ModifierState;
+
+            if (!_isAffectedByCapsLock)
+            {
+                // we need to determine if the shift bit was turned on solely because of the caps lock.
+                // if so, we need to turn it off, because, for this key, it isn't affected by caps,
+                // so the shift shouldn't be toggled because of that
+                // so, what we need to do, is simply update that bit to represent exactly what shift is
+                foreach (var modifier in _viewModel.KeyboardLayout.CharModifiers)
+                {
+                    if (modifier.VirtualKey == (int)VirtualKeyCode.SHIFT)
+                    {
+                        // we found the bit that coresponds to the shift virtual key
+                        if (modifierState.IsShiftOn && !modifierState.IsCapsLockOn)
+                        {
+                            modState = modState & modifier.ModifierBits;
+                        }
+                        else if (modifierState.IsShiftOn && modifierState.IsCapsLockOn)
+                        {
+                            // For keys not affected by caps lock when caps lock is on 
+                            // and shift is on it is treated as just a normal shift
+                            modState = 0001;
+                        }
+                        else
+                        {
+                            modState = modState & ~(modifier.ModifierBits);
+                        }
+                        break;
+                    }
+                }
+
+            }
+
+            var min = Math.Min(modState, _viewModel.KeyboardLayout.ModifierBits.Count - 1);
+
+            var index = _viewModel.KeyboardLayout.ModifierBits[min];
 
             var character = CharacterAtIndex(index);
 
@@ -134,19 +171,17 @@ namespace WPFKeyboard
                     break;
                 }
                 index--;
-                // make sure this index has a combination of bits that are in our current modifications tate
-                character = (_viewModel.ModifierBitsSortedByIndex[index] & modifierState.ModifierState) ==
-                            modifierState.ModifierState ? CharacterAtIndex(index) : Constants.WchNone;
+                // make sure this index has a combination of bits that are in our current modification state
+                character = (_viewModel.ModifierBitsSortedByIndex[index] & modState) ==
+                            modState ? CharacterAtIndex(index) : Constants.WchNone;
             }
 
-            return ((char)character).ToString();
+            return ((char)character).ToString(CultureInfo.InvariantCulture);
         }
 
         private int CharacterAtIndex(int index)
         {
-            if (_characters.Count < index + 1)
-                return Constants.WchNone;
-            return _characters[index];
+            return _characters.Count < index + 1 ? Constants.WchNone : _characters[index];
         }
 
         public override void UpdateDisplay(IModiferStateManager modiferStateManager)

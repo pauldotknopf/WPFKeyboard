@@ -23,5 +23,9 @@ namespace WPFKeyboard
         /// The current modifer state. This is used to determine which key to display, based on the current modifiers.
         /// </summary>
         int ModifierState { get; }
+
+        bool IsShiftOn { get; set; }
+
+        bool IsCapsLockOn { get; set; }
     }
 }
