@@ -17,8 +17,8 @@ namespace WPFKeyboard
 
             _modifierKeys = modifierKeys;
             // We aren't dealing with the visuals of ALT and Control
-            _modifierKeys.Remove((int)VirtualKeyCode.MENU);
-            _modifierKeys.Remove((int)VirtualKeyCode.CONTROL);
+            _modifierKeys.Remove(2);
+            _modifierKeys.Remove(4);
             _state = new Dictionary<int, bool>();
             foreach (var bit in _modifierKeys.Keys)
                 _state.Add(bit, false);
@@ -33,9 +33,10 @@ namespace WPFKeyboard
             {
                 var virtualKey = _modifierKeys[bit];
 
-                _state[bit] = IsToggleKey(virtualKey)
+                var isToggleKey = IsToggleKey(virtualKey);
+                _state[bit] = isToggleKey
                     ? Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(virtualKey)
-                    : Keyboard.InputDeviceStateAdapter.IsKeyDown(virtualKey);
+                    : (Keyboard.InputDeviceStateAdapter.IsHardwareKeyDown(virtualKey));
 
                 if (virtualKey == VirtualKeyCode.SHIFT || virtualKey == VirtualKeyCode.LSHIFT ||
                     virtualKey == VirtualKeyCode.RSHIFT)
@@ -55,8 +56,6 @@ namespace WPFKeyboard
             {
                 _modifierState |= bit;
             }
-
-            // TODO: If caps is pressed or toggled, toggle shift bit
         }
 
         public int ModifierState { get { return _modifierState; } }
@@ -66,7 +65,7 @@ namespace WPFKeyboard
 
         private bool IsToggleKey(VirtualKeyCode key)
         {
-            return key != VirtualKeyCode.SHIFT && key != VirtualKeyCode.MENU && key != VirtualKeyCode.CONTROL;
+            return key == VirtualKeyCode.CAPITAL;
         }
     }
 }

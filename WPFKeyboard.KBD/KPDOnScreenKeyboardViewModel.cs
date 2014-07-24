@@ -35,7 +35,7 @@ namespace WPFKeyboard
                 ? @"C:\Windows\SysWOW64\{0}"
                 : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
             ModiferStateManager = modiferStateManager;
-            modiferStateManager.SetModifierKeys(_keyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits,
+            ModiferStateManager.SetModifierKeys(_keyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits,
                 x => (VirtualKeyCode)x.VirtualKey));
 
             BuildKeyboardLayout();

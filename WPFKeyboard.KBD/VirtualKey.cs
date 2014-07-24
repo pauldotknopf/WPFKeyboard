@@ -28,7 +28,6 @@ namespace WPFKeyboard
             _isAffectedByCapsLock = isAffectedByCapsLock;
             _isStickyKey = IsAStickyKey(_virtualKey);
             _displayText = displayText;
-
             Display = GetDisplayValue(_viewModel.ModiferStateManager);
         }
 
@@ -110,14 +109,17 @@ namespace WPFKeyboard
 
         private bool IsAStickyKey(int code)
         {
-            return code == (int)VirtualKeyCode.LSHIFT || code == (int)VirtualKeyCode.LMENU || code == (int)VirtualKeyCode.LCONTROL ||
-                    code == (int)VirtualKeyCode.RSHIFT || code == (int)VirtualKeyCode.RMENU || code == (int)VirtualKeyCode.RCONTROL;
+            return code == (int)VirtualKeyCode.LSHIFT || code == (int)VirtualKeyCode.LMENU ||
+                   code == (int)VirtualKeyCode.LCONTROL ||
+                   code == (int)VirtualKeyCode.RSHIFT || code == (int)VirtualKeyCode.RMENU ||
+                   code == (int)VirtualKeyCode.RCONTROL;
         }
 
         public VirtualKeyCode Key { get { return _virtualKey; } }
 
         private string GetDisplayValue(IModiferStateManager modifierState)
         {
+
             if (!string.IsNullOrEmpty(_displayText))
                 return _displayText;
 

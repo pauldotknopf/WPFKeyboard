@@ -85,7 +85,6 @@
     <Compile Include="KeyTemplates\WindowsKeyTemplate.xaml.cs">
       <DependentUpon>WindowsKeyTemplate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\SampleKeyboardViewModel.cs" />
     <Page Include="KeyTemplates\DefaultKeyTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
