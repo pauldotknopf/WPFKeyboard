@@ -1,0 +1,15 @@
+﻿<Window x:Class="Sample.Form"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Form" Height="300" Width="300">
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock Text="Field 1" />
+            <TextBox Margin="0,0,0, 10" />
+            <TextBlock Text="Field 2" />
+            <DatePicker Margin="0,0,0, 10" />
+            <TextBlock Text="Field 3" />
+            <TextBox Margin="0,0,0, 10" />
+        </StackPanel>
+    </Grid>
+</Window>

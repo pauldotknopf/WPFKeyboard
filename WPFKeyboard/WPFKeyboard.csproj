@@ -54,6 +54,7 @@
     <Compile Include="Controls\OnScreenKey.cs" />
     <Compile Include="Controls\OnScreenKeyboardSection.cs" />
     <Compile Include="Controls\OnScreenKeyboardRow.cs" />
+    <Compile Include="Controls\PopupKeyboard.cs" />
     <Compile Include="DefaultOnScreenKeyControlBuilder.cs" />
     <Compile Include="IModiferStateManager.cs" />
     <Compile Include="InstalledKeyboardLayout.cs" />
