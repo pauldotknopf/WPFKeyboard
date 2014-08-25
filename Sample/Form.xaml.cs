@@ -47,7 +47,6 @@ namespace Sample
             _keyboardWindow.Hide();
         }
 
-
         private void OnIsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
         }
