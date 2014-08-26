@@ -18,16 +18,52 @@ namespace WPFKeyboard.KBD.Tests
         [Test]
         public void Shift_updates_modifer_state()
         {
-            
+            // Act
+            Keyboard.Simulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+            try
+            {
+                // Arrange
+                _modiferStateManager.Refresh();
+
+                // Assert
+                Assert.That((_modiferStateManager.ModifierState & 1), Is.EqualTo(1));
+
+                // Act
+                Keyboard.Simulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+
+                // Arrange
+                _modiferStateManager.Refresh();
+
+                // Assert
+                Assert.That((_modiferStateManager.ModifierState & 1), Is.EqualTo(0));
+            }
+            finally
+            {
+                Keyboard.Simulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+            }
         }
 
         [Test]
         public void Shift_updates_modifer_state_when_hinted()
         {
+            // Act
             Keyboard.Simulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
             try
             {
+                // Arrange
+                _modiferStateManager.Refresh(keyDown:VirtualKeyCode.SHIFT);
 
+                // Assert
+                Assert.That((_modiferStateManager.ModifierState & 1), Is.EqualTo(1));
+
+                // Act
+                Keyboard.Simulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+
+                // Arrange
+                _modiferStateManager.Refresh(keyUp: VirtualKeyCode.SHIFT);
+
+                // Assert
+                Assert.That((_modiferStateManager.ModifierState & 1), Is.EqualTo(0));
             }
             finally
             {
