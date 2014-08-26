@@ -38,38 +38,40 @@ namespace WPFKeyboard
                     ? Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(virtualKey)
                     : (Keyboard.InputDeviceStateAdapter.IsHardwareKeyDown(virtualKey));
 
+                if (keyDown.HasValue)
+                {
+                    switch (keyDown.Value)
+                    {
+                        case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.RSHIFT:
+                        case VirtualKeyCode.SHIFT:
+                            _state[bit] = true;
+                            break;
+                    }
+                }
+                if (keyUp.HasValue)
+                {
+                    switch (keyUp.Value)
+                    {
+                        case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.RSHIFT:
+                        case VirtualKeyCode.SHIFT:
+                            _state[bit] = false;
+                            break;
+                    }
+                }
+
                 if (virtualKey == VirtualKeyCode.SHIFT)
                 {
-                    if (keyDown.HasValue)
+                    IsShiftOn = _state[bit];
+                    if (Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect((VirtualKeyCode.CAPITAL)))
                     {
-                        switch (virtualKey)
-                        {
-                            case VirtualKeyCode.LSHIFT:
-                            case VirtualKeyCode.RSHIFT:
-                            case VirtualKeyCode.SHIFT:
-                                _state[bit] = true;
-                                break;
-                        }
+                        _state[bit] = !_state[bit];
+                        IsCapsLockOn = true;
                     }
-                    if (keyUp.HasValue)
-                    {
-                        switch (virtualKey)
-                        {
-                            case VirtualKeyCode.LSHIFT:
-                            case VirtualKeyCode.RSHIFT:
-                            case VirtualKeyCode.SHIFT:
-                                _state[bit] = false;
-                                break;
-                        }
-                    }
+                    else IsCapsLockOn = false;
                 }
-                IsShiftOn = _state[bit];
-                if (Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect((VirtualKeyCode.CAPITAL)))
-                {
-                    _state[bit] = !_state[bit];
-                    IsCapsLockOn = true;
-                }
-                else IsCapsLockOn = false;
+
             }
 
             _modifierState = 0;

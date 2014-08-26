@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NUnit.Framework;
+using System;
 using System.Linq;
-using System.Text;
-using WindowsInput;
 using WindowsInput.Native;
-using NUnit.Framework;
 using WPFKeyboardNative;
 
 namespace WPFKeyboard.KBD.Tests

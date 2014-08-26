@@ -119,6 +119,10 @@ namespace WPFKeyboard
 
         private string GetDisplayValue(IModiferStateManager modifierState)
         {
+            if (_virtualKey == VirtualKeyCode.VK_F)
+            {
+
+            }
 
             if (!string.IsNullOrEmpty(_displayText))
                 return _displayText;
