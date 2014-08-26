@@ -12,6 +12,7 @@ namespace WPFKeyboard.Controls
     public class OnScreenKeyboard : Grid
     {
         OnScreenKeyboardViewModel _viewModel;
+        private bool _loaded;
 
         public OnScreenKeyboard()
         {
@@ -127,16 +128,24 @@ namespace WPFKeyboard.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (Helpers.IsInDesignMode) return;
-            Keyboard.KeyDown += OnKeyDown;
-            Keyboard.KeyUp += OnKeyUp;
+            if (!_loaded)
+            {
+                _loaded = true;
+                if (Helpers.IsInDesignMode) return;
+                Keyboard.KeyDown += OnKeyDown;
+                Keyboard.KeyUp += OnKeyUp;
+            }
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (Helpers.IsInDesignMode) return;
-            Keyboard.KeyDown -= OnKeyDown;
-            Keyboard.KeyUp -= OnKeyUp;
+            if (_loaded)
+            {
+                _loaded = false;
+                if (Helpers.IsInDesignMode) return;
+                Keyboard.KeyDown -= OnKeyDown;
+                Keyboard.KeyUp -= OnKeyUp;
+            }
         }
 
         private void OnKeyUp(object sender, KeyEventArgs args)

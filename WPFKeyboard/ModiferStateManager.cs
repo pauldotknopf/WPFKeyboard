@@ -38,8 +38,30 @@ namespace WPFKeyboard
                     ? Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect(virtualKey)
                     : (Keyboard.InputDeviceStateAdapter.IsHardwareKeyDown(virtualKey));
 
-                if (virtualKey == VirtualKeyCode.SHIFT || virtualKey == VirtualKeyCode.LSHIFT ||
-                    virtualKey == VirtualKeyCode.RSHIFT)
+                if (keyDown.HasValue)
+                {
+                    switch (keyDown.Value)
+                    {
+                        case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.RSHIFT:
+                        case VirtualKeyCode.SHIFT:
+                            _state[bit] = true;
+                            break;
+                    }
+                }
+                if (keyUp.HasValue)
+                {
+                    switch (keyUp.Value)
+                    {
+                        case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.RSHIFT:
+                        case VirtualKeyCode.SHIFT:
+                            _state[bit] = false;
+                            break;
+                    }
+                }
+
+                if (virtualKey == VirtualKeyCode.SHIFT)
                 {
                     IsShiftOn = _state[bit];
                     if (Keyboard.InputDeviceStateAdapter.IsTogglingKeyInEffect((VirtualKeyCode.CAPITAL)))
@@ -49,6 +71,7 @@ namespace WPFKeyboard
                     }
                     else IsCapsLockOn = false;
                 }
+
             }
 
             _modifierState = 0;
