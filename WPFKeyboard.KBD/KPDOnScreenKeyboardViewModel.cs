@@ -15,31 +15,10 @@ namespace WPFKeyboard
     /// </summary>
     public class KPDOnScreenKeyboardViewModel : OnScreenKeyboardViewModel
     {
-        #region Ctor
+        #region Fields
 
         KeyboardLayout _keyboardLayout;
         ReadOnlyCollection<int> _modifierBitsSortedByIndex;
-
-        #endregion
-
-        #region Ctor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KPDOnScreenKeyboardViewModel" /> class.
-        /// </summary>
-        /// <param name="installedKeyboardLayout">The installed keyboard layout.</param>
-        /// <param name="modiferStateManager">The modifer state manager.</param>
-        public KPDOnScreenKeyboardViewModel(InstalledKeyboardLayout installedKeyboardLayout, IModiferStateManager modiferStateManager)
-        {
-            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
-                ? @"C:\Windows\SysWOW64\{0}"
-                : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
-            ModiferStateManager = modiferStateManager;
-            ModiferStateManager.SetModifierKeys(_keyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits,
-                x => (VirtualKeyCode)x.VirtualKey));
-
-            BuildKeyboardLayout();
-        }
 
         #endregion
 
@@ -59,6 +38,18 @@ namespace WPFKeyboard
 
         #region Methods
 
+        public void Refresh(InstalledKeyboardLayout installedKeyboardLayout, IModiferStateManager modiferStateManager)
+        {
+            _keyboardLayout = KeyboardLayoutHelper.GetLayout(string.Format(((IntPtr.Size == 8) || NativeMethods.InternalCheckIsWow64())
+                ? @"C:\Windows\SysWOW64\{0}"
+                : @"C:\Windows\System32\{0}", installedKeyboardLayout.LayoutFile));
+            ModiferStateManager = modiferStateManager;
+            ModiferStateManager.SetModifierKeys(_keyboardLayout.CharModifiers.ToDictionary(x => x.ModifierBits,
+                x => (VirtualKeyCode)x.VirtualKey));
+
+            BuildKeyboardLayout();
+        }
+
         #region Private
 
         private void BuildKeyboardLayout()
@@ -74,6 +65,7 @@ namespace WPFKeyboard
                 .Select(x => x.ModBits)
                 .ToList());
 
+            Sections.Clear();
             var mainSection = new OnScreenKeyboardSectionViewModel();
             mainSection.Rows.Add(BuildRow1());
             mainSection.Rows.Add(BuildRow2());
@@ -202,5 +194,7 @@ namespace WPFKeyboard
         #endregion
 
         #endregion
+
+
     }
 }
