@@ -35,9 +35,6 @@
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1402.2112\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="MouseKeyboardActivityMonitor">
-      <HintPath>..\..\MedXChange.X2\SubModules\WPFKeyboard\Dependencies\MouseKeyboardActivityMonitor.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -52,6 +49,9 @@
     <Reference Include="WindowsInput">
       <HintPath>..\Dependencies\WindowsInput.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsKeyboardLayout">
+      <HintPath>..\Release\WindowsKeyboardLayout.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseKeyboardTest.cs" />
@@ -63,10 +63,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WindowsKeyboardLayout\WindowsKeyboardLayout.vcxproj">
-      <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
-      <Name>WindowsKeyboardLayout</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WPFKeyboard.KBD\WPFKeyboard.KBD.csproj">
       <Project>{23207fa6-7dca-4ece-be26-1d0b25e4b326}</Project>
       <Name>WPFKeyboard.KBD</Name>

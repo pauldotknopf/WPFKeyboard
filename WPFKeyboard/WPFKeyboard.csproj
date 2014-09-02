@@ -75,12 +75,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\OnScreenKeyboard.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WindowsKeyboardLayout\WindowsKeyboardLayout.vcxproj">
-      <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
-      <Name>WindowsKeyboardLayout</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
