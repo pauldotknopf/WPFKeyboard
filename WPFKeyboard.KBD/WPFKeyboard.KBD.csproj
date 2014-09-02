@@ -55,10 +55,6 @@
     <Compile Include="VirtualKey.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MedXChange.Library\Src\MedXChange.WPF\MedXChange.WPF.csproj">
-      <Project>{4495C953-407B-4684-B48B-49721CB944BB}</Project>
-      <Name>MedXChange.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WindowsKeyboardLayout\WindowsKeyboardLayout.vcxproj">
       <Project>{ec8eb985-a262-4dc3-8d3e-ae38786c8b7d}</Project>
       <Name>WindowsKeyboardLayout</Name>

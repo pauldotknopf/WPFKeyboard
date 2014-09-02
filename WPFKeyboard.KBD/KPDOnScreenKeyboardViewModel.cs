@@ -194,7 +194,5 @@ namespace WPFKeyboard
         #endregion
 
         #endregion
-
-
     }
 }
