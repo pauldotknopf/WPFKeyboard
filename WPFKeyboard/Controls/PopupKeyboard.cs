@@ -20,6 +20,10 @@ namespace WPFKeyboard.Controls
         {
             var allScreens = System.Windows.Forms.Screen.AllScreens;
 
+            // Sometimes the visual is not connected to a presentation source so we return if this is the case.
+            if (PresentationSource.FromVisual(focusedElement) == null)
+                return;
+
             // get the x/y for the control based off of the entire viewing area
             var locationFromScreen = focusedElement.PointToScreen(focusedElement.TranslatePoint(new Point(0, 0), this));
             var elementRectangle = new System.Drawing.Rectangle((int)locationFromScreen.X, (int)locationFromScreen.Y,
