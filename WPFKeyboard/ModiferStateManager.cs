@@ -16,9 +16,6 @@ namespace WPFKeyboard
             if (modifierKeys == null) throw new ArgumentNullException("modifierKeys");
 
             _modifierKeys = modifierKeys;
-            // We aren't dealing with the visuals of ALT and Control
-            _modifierKeys.Remove(2);
-            _modifierKeys.Remove(4);
             _state = new Dictionary<int, bool>();
             foreach (var bit in _modifierKeys.Keys)
                 _state.Add(bit, false);
@@ -40,25 +37,75 @@ namespace WPFKeyboard
 
                 if (keyDown.HasValue)
                 {
-                    switch (keyDown.Value)
-                    {
-                        case VirtualKeyCode.LSHIFT:
-                        case VirtualKeyCode.RSHIFT:
-                        case VirtualKeyCode.SHIFT:
-                            _state[bit] = true;
-                            break;
-                    }
+                    if (virtualKey == VirtualKeyCode.SHIFT
+                        || virtualKey == VirtualKeyCode.LSHIFT
+                        || virtualKey == VirtualKeyCode.RSHIFT)
+                        switch (keyDown.Value)
+                        {
+                            case VirtualKeyCode.LSHIFT:
+                            case VirtualKeyCode.RSHIFT:
+                            case VirtualKeyCode.SHIFT:
+                                _state[bit] = true;
+                                break;
+                        }
+                    if (virtualKey == VirtualKeyCode.MENU
+                        || virtualKey == VirtualKeyCode.LMENU
+                        || virtualKey == VirtualKeyCode.RMENU)
+                        switch (keyDown.Value)
+                        {
+                            case VirtualKeyCode.MENU:
+                            case VirtualKeyCode.LMENU:
+                            case VirtualKeyCode.RMENU:
+                                _state[bit] = true;
+                                break;
+                        }
+                    if (virtualKey == VirtualKeyCode.CONTROL
+                        || virtualKey == VirtualKeyCode.LCONTROL
+                        || virtualKey == VirtualKeyCode.RCONTROL)
+                        switch (keyDown.Value)
+                        {
+                            case VirtualKeyCode.CONTROL:
+                            case VirtualKeyCode.LCONTROL:
+                            case VirtualKeyCode.RCONTROL:
+                                _state[bit] = true;
+                                break;
+                        }
                 }
                 if (keyUp.HasValue)
                 {
-                    switch (keyUp.Value)
-                    {
-                        case VirtualKeyCode.LSHIFT:
-                        case VirtualKeyCode.RSHIFT:
-                        case VirtualKeyCode.SHIFT:
-                            _state[bit] = false;
-                            break;
-                    }
+                    if (virtualKey == VirtualKeyCode.SHIFT
+                        || virtualKey == VirtualKeyCode.LSHIFT
+                        || virtualKey == VirtualKeyCode.RSHIFT)
+                        switch (keyUp.Value)
+                        {
+                            case VirtualKeyCode.LSHIFT:
+                            case VirtualKeyCode.RSHIFT:
+                            case VirtualKeyCode.SHIFT:
+                                _state[bit] = false;
+                                break;
+                        }
+                    if (virtualKey == VirtualKeyCode.MENU
+                        || virtualKey == VirtualKeyCode.LMENU
+                        || virtualKey == VirtualKeyCode.RMENU)
+                        switch (keyUp.Value)
+                        {
+                            case VirtualKeyCode.MENU:
+                            case VirtualKeyCode.LMENU:
+                            case VirtualKeyCode.RMENU:
+                                _state[bit] = false;
+                                break;
+                        }
+                    if (virtualKey == VirtualKeyCode.CONTROL
+                        || virtualKey == VirtualKeyCode.LCONTROL
+                        || virtualKey == VirtualKeyCode.RCONTROL)
+                        switch (keyUp.Value)
+                        {
+                            case VirtualKeyCode.CONTROL:
+                            case VirtualKeyCode.LCONTROL:
+                            case VirtualKeyCode.RCONTROL:
+                                _state[bit] = false;
+                                break;
+                        }
                 }
 
                 if (virtualKey == VirtualKeyCode.SHIFT)
