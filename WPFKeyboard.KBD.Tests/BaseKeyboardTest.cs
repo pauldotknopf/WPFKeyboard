@@ -27,8 +27,8 @@ namespace WPFKeyboard.KBD.Tests
                : @"C:\Windows\System32\{0}", GetKeyboardLayout().LayoutFile));
             _modifierKeys = _keyboardLayout.CharModifiers.ToDictionary(x => (VirtualKeyCode) x.VirtualKey,
                 x => x.ModifierBits);
-            // TODO: Fix unit tests!
-            //_viewModel = new KPDOnScreenKeyboardViewModel(GetKeyboardLayout(), _modifierStateManager.Object);
+            _viewModel = new KPDOnScreenKeyboardViewModel();
+            _viewModel.Refresh(GetKeyboardLayout(), _modifierStateManager.Object);
         }
 
         [TearDown]
@@ -36,9 +36,12 @@ namespace WPFKeyboard.KBD.Tests
         {
         }
 
-        protected void SimulateModiferKeys(params VirtualKeyCode[] modiferKeys)
+        protected void SimulateModiferKeys(bool isCapsLockOn = false, bool isShiftOn = false, params VirtualKeyCode[] modiferKeys)
         {
-            _modifierStateManager.Setup(x => x.ModifierState).Returns(modiferKeys.Aggregate(0, (current, key) => current | _modifierKeys[key]));
+            var newState = modiferKeys.Aggregate(0, (current, key) => current | _modifierKeys[key]);
+            _modifierStateManager.Setup(x => x.ModifierState).Returns(newState);
+            _modifierStateManager.Setup(x => x.IsCapsLockOn).Returns(isCapsLockOn);
+            _modifierStateManager.Setup(x => x.IsShiftOn).Returns(isShiftOn);
         }
 
         public abstract InstalledKeyboardLayout GetKeyboardLayout();

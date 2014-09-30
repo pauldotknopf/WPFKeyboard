@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WindowsInput.Native;
 
 namespace WPFKeyboard
 {
@@ -61,6 +62,44 @@ namespace WPFKeyboard
                 layoutDisplayName = layoutText;
 
             return new InstalledKeyboardLayout(locale, layoutDisplayName, layoutFile, layoutText);
+        }
+
+        public static string GetKeyNameFromVirtualKey(IntPtr keyboardLayout, WindowsInput.Native.VirtualKeyCode virtualKey, int modifierState, Dictionary<VirtualKeyCode, int> modifierKeys, bool capsAffectsShift)
+        {
+            var keyState = new byte[256];
+
+            if (!NativeMethods.GetKeyboardState(keyState))
+                return null;
+
+            foreach (var modBit in modifierKeys)
+            {
+                if ((modifierState & modBit.Value) == modBit.Value)
+                {
+                    keyState[(int)modBit.Key] = 129;
+                }
+            }
+
+            var character = new StringBuilder(10);
+            var result = NativeMethods.ToUnicodeEx((uint)virtualKey, 0, keyState, character, character.Capacity, 0, keyboardLayout);
+
+            // If unshifter was a dead key, so will be shifted.
+            if (result < 0)
+            {
+                int dummy = NativeMethods.ToUnicodeEx(
+                    (uint)VirtualKeyCode.SPACE,
+                    NativeMethods.MapVirtualKeyEx((uint)VirtualKeyCode.SPACE, 0, keyboardLayout),
+                    keyState,
+                    character,
+                    character.Capacity,
+                    0,
+                    keyboardLayout);
+
+                // There will be one character stored in our buffer though:
+                // (well, at least one, but we have no way of knowing if more)
+                result = 1;
+            }
+
+            return character.ToString();
         }
     }
 }

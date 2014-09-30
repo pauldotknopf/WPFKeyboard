@@ -29,8 +29,8 @@ namespace Sample
         {
             InitializeComponent();
             VirtualKeyboard.OnScreenKeyControlBuilder = new SampleKeyControlBuilder();
-            // TODO: Fix constructor!
-            //VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel(KeyboardHelper.InstalledKeyboardLayouts["US"], new ModiferStateManager());
+            VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel();
+            ((KPDOnScreenKeyboardViewModel)VirtualKeyboard.DataContext).Refresh(KeyboardHelper.InstalledKeyboardLayouts["US"], new ModiferStateManager());
         }
     }
 }

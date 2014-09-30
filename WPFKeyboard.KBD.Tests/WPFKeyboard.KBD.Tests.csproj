@@ -57,6 +57,7 @@
     <Compile Include="BaseKeyboardTest.cs" />
     <Compile Include="ModiferStateManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ToUnicodeTests.cs" />
     <Compile Include="USKeyboardTests.cs" />
   </ItemGroup>
   <ItemGroup>

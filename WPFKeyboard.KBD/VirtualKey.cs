@@ -155,29 +155,63 @@ namespace WPFKeyboard
                         break;
                     }
                 }
-
             }
 
-            var min = Math.Min(modState, _viewModel.KeyboardLayout.ModifierBits.Count - 1);
-
-            var index = _viewModel.KeyboardLayout.ModifierBits[min];
-
-            var character = CharacterAtIndex(index);
-
-            while (character == Constants.WchNone || CharUnicodeInfo.GetUnicodeCategory((char)character) == UnicodeCategory.Control)
+            if (modState < _viewModel.KeyboardLayout.ModifierBits.Count)
             {
-                if (index == 0)
+                var character = CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
+                if (character != Constants.WchNone && CharUnicodeInfo.GetUnicodeCategory((char)character) != UnicodeCategory.Control)
                 {
-                    character = CharacterAtIndex(index);
+                    return ((char)character).ToString(CultureInfo.InvariantCulture);
+                }
+            }
+
+            // no character for the given modification.
+            // lets load normal/shift values
+
+            int shiftModBit = -1;
+
+            foreach (var value in _viewModel.KeyboardLayout.CharModifiers)
+            {
+                if (value.VirtualKey == (int)VirtualKeyCode.SHIFT)
+                {
+                    shiftModBit = value.ModifierBits;
                     break;
                 }
-                index--;
-                // make sure this index has a combination of bits that are in our current modification state
-                character = (_viewModel.ModifierBitsSortedByIndex[index] & modState) ==
-                            modState ? CharacterAtIndex(index) : Constants.WchNone;
             }
 
-            return ((char)character).ToString(CultureInfo.InvariantCulture);
+            if (shiftModBit != -1)
+            {
+                modState = modState & shiftModBit;
+                var character = CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
+                if (character != Constants.WchNone && CharUnicodeInfo.GetUnicodeCategory((char)character) != UnicodeCategory.Control)
+                {
+                    return ((char)character).ToString(CultureInfo.InvariantCulture);
+                }
+            }
+
+            return "";
+
+            //var min = Math.Min(modState, _viewModel.KeyboardLayout.ModifierBits.Count - 1);
+
+            //var index = _viewModel.KeyboardLayout.ModifierBits[min];
+
+            //var character = CharacterAtIndex(index);
+
+            //while (character == Constants.WchNone || CharUnicodeInfo.GetUnicodeCategory((char)character) == UnicodeCategory.Control)
+            //{
+            //    if (index == 0)
+            //    {
+            //        character = CharacterAtIndex(index);
+            //        break;
+            //    }
+            //    index--;
+            //    // make sure this index has a combination of bits that are in our current modification state
+            //    character = (_viewModel.ModifierBitsSortedByIndex[index] & modState) ==
+            //                modState ? CharacterAtIndex(index) : Constants.WchNone;
+            //}
+
+            //return ((char)character).ToString(CultureInfo.InvariantCulture);
         }
 
         private int CharacterAtIndex(int index)

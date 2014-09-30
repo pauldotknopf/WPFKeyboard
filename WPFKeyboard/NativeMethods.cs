@@ -64,6 +64,10 @@ namespace WPFKeyboard
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool UnloadKeyboardLayout(IntPtr hkl);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetKeyboardState(byte[] lpKeyState);
+
         [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, ThrowOnUnmappableChar = true)]
         public static extern int ToUnicodeEx(
             uint wVirtKey,
