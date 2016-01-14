@@ -54,13 +54,13 @@ namespace WPFKeyboard.Controls
                 targetScreen.Bounds.X,
                 targetScreen.Bounds.Y,
                 targetScreen.Bounds.Width,
-                targetScreen.Bounds.Height / 2);
+                targetScreen.Bounds.Height - (int)Height - (int)focusedElement.ActualHeight);
             topHalf.Intersect(elementRectangle);
             var bottomHalf = new System.Drawing.Rectangle(
                 targetScreen.Bounds.X,
-                targetScreen.Bounds.Y + (targetScreen.Bounds.Height / 2),
+                targetScreen.Bounds.Y + topHalf.Height,
                 targetScreen.Bounds.Width,
-                targetScreen.Bounds.Height / 2);
+                targetScreen.Bounds.Height - topHalf.Height);
             bottomHalf.Intersect(elementRectangle);
 
             // are we showing the keyboard on the top or bottom of the monitor?
