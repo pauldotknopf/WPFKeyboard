@@ -50,19 +50,21 @@ namespace WPFKeyboard.Controls
             // now that we have our screen, lets split the screen in half horizontally.
             // we will then use these intersections to determine if we should render the keyboard
             // on the top or bottom
+            var bottomHalf = new System.Drawing.Rectangle(
+                targetScreen.Bounds.X,
+                targetScreen.Bounds.Height - (int)Height,
+                targetScreen.Bounds.Width,
+                targetScreen.Bounds.Height);
+            Debug.WriteLine("Bottom:" + bottomHalf);
+            bottomHalf.Intersect(elementRectangle); 
             var topHalf = new System.Drawing.Rectangle(
                 targetScreen.Bounds.X,
                 targetScreen.Bounds.Y,
                 targetScreen.Bounds.Width,
-                targetScreen.Bounds.Height - (int)Height - (int)focusedElement.ActualHeight);
+                targetScreen.Bounds.Height - (int)Height);
+            Debug.WriteLine("Top:" + bottomHalf);
             topHalf.Intersect(elementRectangle);
-            var bottomHalf = new System.Drawing.Rectangle(
-                targetScreen.Bounds.X,
-                targetScreen.Bounds.Y + topHalf.Height,
-                targetScreen.Bounds.Width,
-                targetScreen.Bounds.Height - topHalf.Height);
-            bottomHalf.Intersect(elementRectangle);
-
+            
             // are we showing the keyboard on the top or bottom of the monitor?
             var isBottom = (topHalf.IsEmpty ? 0 : topHalf.X * topHalf.X) >
                             (bottomHalf.IsEmpty ? 0 : bottomHalf.X * bottomHalf.Y);
