@@ -26,13 +26,21 @@ namespace WPFKeyboard.Controls
             if (_viewModel != null)
             {
                 _viewModel.Rows.CollectionChanged -= OnRowsCollectionChanged;
+                while (Children.Count > 0)
+                {
+                    var child = Children[Children.Count - 1];
+                    if (child is FrameworkElement)
+                        (child as FrameworkElement).DataContext = null;
+                    Children.Remove(child);
+                }
+                RowDefinitions.Clear();
+                ColumnDefinitions.Clear();
                 _viewModel = null;
-                OnRowsCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
 
             if (DataContext is OnScreenKeyboardSectionViewModel)
             {
-                _viewModel = DataContext as OnScreenKeyboardSectionViewModel;
+                _viewModel = (OnScreenKeyboardSectionViewModel) DataContext;
                 _viewModel.Rows.CollectionChanged += OnRowsCollectionChanged;
                 OnRowsCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }

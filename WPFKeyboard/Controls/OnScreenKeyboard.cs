@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,6 @@ namespace WPFKeyboard.Controls
     public class OnScreenKeyboard : Grid
     {
         OnScreenKeyboardViewModel _viewModel;
-        private bool _loaded;
 
         public OnScreenKeyboard()
         {
@@ -75,19 +75,45 @@ namespace WPFKeyboard.Controls
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
-            if (_viewModel != null)
+            if (DataContext == null)
             {
-                _viewModel.Sections.CollectionChanged -= OnSectionsCollectionChanged;
-                _viewModel = null;
-                OnSectionsCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                if (_viewModel != null)
+                {
+                    _viewModel.Sections.CollectionChanged -= OnSectionsCollectionChanged;
+                    _viewModel = null;
+                }
+                while (Children.Count > 0)
+                {
+                    var child = (OnScreenKeyboardSection)Children[Children.Count - 1];
+                    child.DataContext = null;
+                    Children.Remove(child);
+                }
+                ColumnDefinitions.Clear();
+                RowDefinitions.Clear();
+                return;
             }
 
-            if (DataContext is OnScreenKeyboardViewModel)
+            if (!(DataContext is OnScreenKeyboardViewModel))
             {
-                _viewModel = DataContext as OnScreenKeyboardViewModel;
-                _viewModel.Sections.CollectionChanged += OnSectionsCollectionChanged;
-                OnSectionsCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                if (_viewModel != null)
+                {
+                    _viewModel.Sections.CollectionChanged -= OnSectionsCollectionChanged;
+                    _viewModel = null;
+                }
+                while (Children.Count > 0)
+                {
+                    var child = (OnScreenKeyboardSection)Children[Children.Count - 1];
+                    child.DataContext = null;
+                    Children.Remove(child);
+                }
+                ColumnDefinitions.Clear();
+                RowDefinitions.Clear();
+                return;
             }
+
+            _viewModel = (OnScreenKeyboardViewModel)DataContext;
+            _viewModel.Sections.CollectionChanged += OnSectionsCollectionChanged;
+            OnSectionsCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void OnSectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -128,28 +154,24 @@ namespace WPFKeyboard.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (!_loaded)
-            {
-                _loaded = true;
-                if (Helpers.IsInDesignMode) return;
-                Keyboard.KeyDown += OnKeyDown;
-                Keyboard.KeyUp += OnKeyUp;
-            }
+            if (Helpers.IsInDesignMode) return;
+
+            Keyboard.KeyDown += OnKeyDown;
+            Keyboard.KeyUp += OnKeyUp;
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (_loaded)
-            {
-                _loaded = false;
-                if (Helpers.IsInDesignMode) return;
-                Keyboard.KeyDown -= OnKeyDown;
-                Keyboard.KeyUp -= OnKeyUp;
-            }
+            if (Helpers.IsInDesignMode) return;
+
+            Keyboard.KeyDown -= OnKeyDown;
+            Keyboard.KeyUp -= OnKeyUp;
         }
 
         private void OnKeyUp(object sender, KeyEventArgs args)
         {
+            if (_viewModel == null) return;
+
             if (_viewModel.ModiferStateManager != null)
                 _viewModel.ModiferStateManager.Refresh((VirtualKeyCode)args.KeyCode);
 
@@ -159,6 +181,8 @@ namespace WPFKeyboard.Controls
 
         private void OnKeyDown(object sender, KeyEventArgs args)
         {
+            if (_viewModel == null) return;
+
             if (_viewModel.ModiferStateManager != null)
                 _viewModel.ModiferStateManager.Refresh(keyDown: (VirtualKeyCode)args.KeyCode);
 

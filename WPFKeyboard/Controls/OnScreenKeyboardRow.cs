@@ -24,6 +24,13 @@ namespace WPFKeyboard.Controls
             {
                 _viewModel.Keys.CollectionChanged -= OnKeysCollectionChanged;
                 _viewModel = null;
+                while (Children.Count > 0)
+                {
+                    var child = (OnScreenKey)Children[Children.Count - 1];
+                    child.DataContext = null;
+                    Children.Remove(child);
+                }
+                ColumnDefinitions.Clear();
                 OnKeysCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
 
