@@ -175,7 +175,7 @@ namespace WPFKeyboard
 
             var virtualKey = (VirtualKeyCode)(sc.VirtualKey & 0xFF);
 
-            var virtualKeyInfo = KeyboardLayout.VirtualKeys.SingleOrDefault(x => x.Key == sc.VirtualKey);
+            var virtualKeyInfo = KeyboardLayout.VirtualKeys.FirstOrDefault(x => x.Key == sc.VirtualKey);
 
             var scanCodeText = KeyboardLayout.CodeText.SingleOrDefault(x => x.ScanCode == scanCode);
 
