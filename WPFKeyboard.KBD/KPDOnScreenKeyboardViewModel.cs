@@ -184,7 +184,7 @@ namespace WPFKeyboard
                 this,
                 virtualKey,
                 scanCodeText != null ? scanCodeText.Text : null,
-                virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<int>(),
+                virtualKeyInfo != null ? virtualKeyInfo.Characters.ToList() : new List<VirtualKeyCharacter>(),
                 virtualKeyInfo != null && virtualKeyInfo.Attributes == 1)
                 {
                     ButtonWidth = new GridLength(widthWeight, GridUnitType.Star)

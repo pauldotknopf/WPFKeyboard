@@ -145,11 +145,34 @@ void CKLL::Fill32()
 
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
-				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
+				if (pVkToWch->wch[i] == WCH_LGTR)
+				{
+					VK_STRUCT_KEY key;
+					key.Character = 0;
+					key.IsLig = true;
+
+					PLIGATURE1 current = KbdTables->pLigature;
+					while (current)
+					{
+						if (current->VirtualKey == pVK->VirtualKey)
+						{
+							key.Ligs.insert(key.Ligs.end(), current->wch[i]);
+						}
+						current = (PLIGATURE1)(((PBYTE)current) + KbdTables64->cbLgEntry);
+					}
+
+					pVK->Characters.insert(pVK->Characters.end(), key);
+				}
+				else
+				{
+					VK_STRUCT_KEY key;
+					key.Character = pVkToWch->wch[i];
+					key.IsLig = false;
+
+					pVK->Characters.insert(pVK->Characters.end(), key);
+				}
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);
-
-			pVkToWch = (PVK_TO_WCHARS1)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
 		}
 		++pVkToWchTbl;
 	}
@@ -246,8 +269,37 @@ void CKLL::Fill64()
 
 			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
 			{
-				//std::wcout << "Char: " << pVkToWch->wch[i] << "\n";
-				pVK->Characters.insert(pVK->Characters.end(), pVkToWch->wch[i]);
+				if (pVkToWch->wch[i] == WCH_LGTR) 
+				{
+					VK_STRUCT_KEY key;
+					key.Character = 0;
+					key.IsLig = true;
+
+					PLIGATURE641 current = KbdTables64->pLIGATURE64;
+					while (current)
+					{
+						if (current->VirtualKey == pVK->VirtualKey && current->ModificationNumber == i)
+						{
+							key.Ligs.insert(key.Ligs.end(), current->wch[0]);
+							key.Ligs.insert(key.Ligs.end(), current->wch[1]);
+							break;
+						}
+						current = (PLIGATURE641)(((PBYTE)current) + KbdTables64->cbLgEntry);
+					}
+
+					/*key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[0]);
+					key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[1]);*/
+
+					pVK->Characters.insert(pVK->Characters.end(), key);
+				}
+				else
+				{
+					VK_STRUCT_KEY key;
+					key.Character = pVkToWch->wch[i];
+					key.IsLig = false;
+
+					pVK->Characters.insert(pVK->Characters.end(), key);
+				}
 			}
 			m_vkarray.insert(m_vkarray.end(), pVK);
 

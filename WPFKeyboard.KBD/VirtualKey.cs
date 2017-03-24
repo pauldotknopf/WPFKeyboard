@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using WindowsInput.Native;
 using WPFKeyboard.Models;
+using WPFKeyboardNative;
 
 namespace WPFKeyboard
 {
@@ -10,7 +12,7 @@ namespace WPFKeyboard
     {
         private readonly KPDOnScreenKeyboardViewModel _viewModel;
         private readonly VirtualKeyCode _virtualKey;
-        private readonly List<int> _characters;
+        private readonly List<VirtualKeyCharacter> _characters;
         private readonly bool _isAffectedByCapsLock;
         private readonly bool _isStickyKey;
         private bool _isStickyEnabled;
@@ -19,7 +21,7 @@ namespace WPFKeyboard
         public VirtualKey(KPDOnScreenKeyboardViewModel viewModel,
             VirtualKeyCode virtualKey,
             string displayText,
-            List<int> characters,
+            List<VirtualKeyCharacter> characters,
             bool isAffectedByCapsLock)
         {
             _viewModel = viewModel;
@@ -159,11 +161,7 @@ namespace WPFKeyboard
 
             if (modState < _viewModel.KeyboardLayout.ModifierBits.Count)
             {
-                var character = CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
-                if (character != Constants.WchNone && CharUnicodeInfo.GetUnicodeCategory((char)character) != UnicodeCategory.Control)
-                {
-                    return ((char)character).ToString(CultureInfo.InvariantCulture);
-                }
+                return CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
             }
 
             // no character for the given modification.
@@ -183,11 +181,7 @@ namespace WPFKeyboard
             if (shiftModBit != -1)
             {
                 modState = modState & shiftModBit;
-                var character = CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
-                if (character != Constants.WchNone && CharUnicodeInfo.GetUnicodeCategory((char)character) != UnicodeCategory.Control)
-                {
-                    return ((char)character).ToString(CultureInfo.InvariantCulture);
-                }
+                return CharacterAtIndex(_viewModel.KeyboardLayout.ModifierBits[modState]);
             }
 
             return "";
@@ -214,9 +208,33 @@ namespace WPFKeyboard
             //return ((char)character).ToString(CultureInfo.InvariantCulture);
         }
 
-        private int CharacterAtIndex(int index)
+        private string CharacterAtIndex(int index)
         {
-            return _characters.Count < index + 1 ? Constants.WchNone : _characters[index];
+            var returnString = "";
+
+            if (index >= _characters.Count)
+            {
+                index = 0;
+            }
+
+            if (_characters[index].IsLig)
+            {
+                var stringBuilder = new StringBuilder();
+
+                foreach (int i in _characters[index].Ligs)
+                {
+                    stringBuilder.Append(char.ConvertFromUtf32(i));
+                }
+
+                //Normalize will accurately show the ligature
+                returnString = stringBuilder.ToString().Normalize();
+            }
+            else
+            {
+                returnString = ((char)_characters[index].Character).ToString(CultureInfo.InvariantCulture);
+            }
+
+            return returnString;
         }
 
         public override void UpdateDisplay(IModiferStateManager modiferStateManager)

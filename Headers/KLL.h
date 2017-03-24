@@ -14,11 +14,17 @@ class __declspec( dllexport ) CKLL
 {
 public:
 
+	struct VK_STRUCT_KEY
+	{
+		bool IsLig;
+		int Character;
+		std::vector<int> Ligs;
+	};
 	struct VK_STRUCT
 	{
 		int VirtualKey;
 		int Attributes;
-		std::vector<int> Characters;
+		std::vector<VK_STRUCT_KEY> Characters;
 	};
 	struct VK_MODIFIER
 	{
