@@ -48,7 +48,7 @@
       <HintPath>..\Dependencies\WindowsInput.dll</HintPath>
     </Reference>
     <Reference Include="WindowsKeyboardLayout">
-      <HintPath>..\Debug\WindowsKeyboardLayout.dll</HintPath>
+      <HintPath>..\Dependencies\WindowsKeyboardLayout.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
