@@ -13,7 +13,7 @@ namespace Sample
             InitializeComponent();
             VirtualKeyboard.OnScreenKeyControlBuilder = new SampleKeyControlBuilder();
             VirtualKeyboard.DataContext = new KPDOnScreenKeyboardViewModel();
-            ((KPDOnScreenKeyboardViewModel)VirtualKeyboard.DataContext).Refresh(KeyboardHelper.InstalledKeyboardLayouts["Spanish"], new ModiferStateManager());
+            ((KPDOnScreenKeyboardViewModel)VirtualKeyboard.DataContext).Refresh(KeyboardHelper.InstalledKeyboardLayouts["US"], new ModiferStateManager());
         }
     }
 }

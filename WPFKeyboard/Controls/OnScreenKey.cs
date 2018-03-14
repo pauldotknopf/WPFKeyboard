@@ -24,12 +24,12 @@ namespace WPFKeyboard.Controls
             Focusable = false;
             SetBinding(IsActiveProperty, new Binding("IsActive"));
             SetBinding(StyleProperty, new Binding("OnScreenKeyStyle") { Source = _onScreenKeyboard });
-            PreviewMouseDown += OnMouseDown;
+            PreviewMouseDown += OnPreviewMouseDown;
             PreviewMouseUp += OnPreviewMouseUp;
             IsMouseDirectlyOverChanged += OnIsMouseDirectlyOverChanged;
+            PreviewTouchDown += OnPreviewTouchDown;
+            PreviewTouchUp += OnPreviewTouchUp;
         }
-
-
 
         #region Properties
 
@@ -103,7 +103,37 @@ namespace WPFKeyboard.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="mouseButtonEventArgs"></param>
-        private void OnMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        private void OnPreviewMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            if (!_isActive)
+            {
+                _isActive = true;
+                var buttonEvent = DataContext as IButtonEventListener;
+                if (buttonEvent != null)
+                {
+                    _onScreenKeyboard.IsVirtual = true;
+                    buttonEvent.ButtonDown();
+                    _onScreenKeyboard.IsVirtual = false;
+                }
+            }
+        }
+
+        private void OnPreviewTouchUp(object sender, TouchEventArgs touchEventArgs)
+        {
+            if (_isActive)
+            {
+                _isActive = false;
+                var buttonEvent = DataContext as IButtonEventListener;
+                if (buttonEvent != null)
+                {
+                    _onScreenKeyboard.IsVirtual = true;
+                    buttonEvent.ButtonUp();
+                    _onScreenKeyboard.IsVirtual = false;
+                }
+            }
+        }
+
+        private void OnPreviewTouchDown(object sender, TouchEventArgs touchEventArgs)
         {
             if (!_isActive)
             {
