@@ -13,7 +13,7 @@ namespace WPFKeyboard.Controls
         public PopupKeyboard()
         {
             AllowsTransparency = true;
-            Placement = PlacementMode.Absolute;
+            Placement = PlacementMode.Center;
         }
 
         public void Show(FrameworkElement focusedElement)
@@ -64,14 +64,21 @@ namespace WPFKeyboard.Controls
                 targetScreen.Bounds.Height - (int)Height);
             Debug.WriteLine("Top:" + bottomHalf);
             topHalf.Intersect(elementRectangle);
-            
+
             // are we showing the keyboard on the top or bottom of the monitor?
             var isBottom = (topHalf.IsEmpty ? 0 : topHalf.X * topHalf.X) >
                             (bottomHalf.IsEmpty ? 0 : bottomHalf.X * bottomHalf.Y);
-
-            PlacementRectangle = isBottom
-                ? new Rect(targetScreen.Bounds.X + ((targetScreen.Bounds.Width - Width) / 2), targetScreen.Bounds.Y + (targetScreen.Bounds.Height - Height), Width, Height)
-                : new Rect(targetScreen.Bounds.X + ((targetScreen.Bounds.Width - Width) / 2), targetScreen.Bounds.Y, Width, Height);
+            
+            PlacementRectangle = new Rect(0, 0, targetScreen.Bounds.Width, targetScreen.Bounds.Height);
+            
+            if(isBottom)
+            {
+                VerticalOffset = targetScreen.Bounds.Height / 2;
+            }
+            else
+            {
+                VerticalOffset = 0 - (targetScreen.Bounds.Height / 2);
+            }
 
             IsOpen = true;
         }
