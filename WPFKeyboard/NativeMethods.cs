@@ -44,6 +44,9 @@ namespace WPFKeyboard
 
         #region Keyboard
 
+        [DllImport("user32.dll")]
+        static extern IntPtr GetKeyboardLayout(uint idThread);
+        
         [DllImport("user32.dll", CharSet = CharSet.Unicode,
             EntryPoint = "MapVirtualKeyExW", ExactSpelling = true)]
         public static extern uint MapVirtualKeyEx(

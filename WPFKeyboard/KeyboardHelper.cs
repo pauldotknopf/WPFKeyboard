@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using WindowsInput.Native;
 
@@ -36,7 +37,7 @@ namespace WPFKeyboard
             foreach (var locale in registry.GetSubKeyNames())
             {
                 var layout = BuildKeyboardLayout(locale);
-                InstalledKeyboardLayouts.Add(layout.LayoutText, layout);
+                InstalledKeyboardLayouts.Add(locale, layout);
             }
         }
 
