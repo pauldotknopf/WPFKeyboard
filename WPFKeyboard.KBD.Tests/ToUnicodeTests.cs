@@ -15,14 +15,15 @@ namespace WPFKeyboard.KBD.Tests
         [Test]
         public void Can_get_characters_from_mod_bits() 
         {
-            var handle = InputLanguage.InstalledInputLanguages.Cast<InputLanguage>().First().Handle;
+            //var handle = InputLanguage.InstalledInputLanguages.Cast<InputLanguage>().First().Handle;
+            var handle = NativeMethods.GetKeyboardLayout(0);
             SimulateModiferKeys(false, false, VirtualKeyCode.SHIFT, VirtualKeyCode.SHIFT);
             var resut = KeyboardHelper.GetKeyNameFromVirtualKey(handle, WindowsInput.Native.VirtualKeyCode.VK_A, _modifierStateManager.Object.ModifierState, _modifierKeys, true);
         }
 
         public override InstalledKeyboardLayout GetKeyboardLayout()
         {
-            return KeyboardHelper.InstalledKeyboardLayouts["US"];
+            return KeyboardHelper.InstalledKeyboardLayouts[((NativeMethods.GetKeyboardLayout(0).ToInt32() >> 16) & 0xFFFF).ToString("x8")];
         }
     }
 }
