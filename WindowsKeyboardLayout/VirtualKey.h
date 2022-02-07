@@ -5,12 +5,14 @@ namespace WPFKeyboardNative
 	public ref class VirtualKeyCharacter
 	{
 	private:
+		bool _isDeadKey;
 		bool _isLig;
 		int _character;
 		array<int>^ _ligs;
 	public:
-		VirtualKeyCharacter(bool isLog, int character, array<int>^ ligs);
+		VirtualKeyCharacter(bool isLog, bool isDeadKey, int character, array<int>^ ligs);
 		property bool IsLig { bool get(); }
+		property bool IsDeadKey { bool get(); }
 		property int Character { int get(); }
 		property array<int>^ Ligs { array<int>^ get(); }
 	};

@@ -263,46 +263,62 @@ void CKLL::Fill64()
 		PVK_TO_WCHARS641 pVkToWch = pVkToWchTbl->pVkToWchars;
 		while (pVkToWch->VirtualKey)
 		{
-			VK_STRUCT *pVK = new VK_STRUCT();
-			pVK->VirtualKey = (int)pVkToWch->VirtualKey;
-			pVK->Attributes = pVkToWch->Attributes;
-
-			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
+			if (pVkToWch->VirtualKey != 0xFF)
 			{
-				if (pVkToWch->wch[i] == WCH_LGTR) 
-				{
-					VK_STRUCT_KEY key;
-					key.Character = 0;
-					key.IsLig = true;
+				VK_STRUCT *pVK = new VK_STRUCT();
+				pVK->VirtualKey = (int)pVkToWch->VirtualKey;
+				pVK->Attributes = pVkToWch->Attributes;
 
-					PLIGATURE641 current = KbdTables64->pLIGATURE64;
-					while (current)
+				for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
+				{
+					if (pVkToWch->wch[i] == WCH_LGTR)
 					{
-						if (current->VirtualKey == pVK->VirtualKey && current->ModificationNumber == i)
+						VK_STRUCT_KEY key;
+						key.Character = 0;
+						key.IsLig = true;
+						key.IsDeadKey = false;
+
+						PLIGATURE641 current = KbdTables64->pLIGATURE64;
+						while (current)
 						{
-							key.Ligs.insert(key.Ligs.end(), current->wch[0]);
-							key.Ligs.insert(key.Ligs.end(), current->wch[1]);
-							break;
+							if (current->VirtualKey == pVK->VirtualKey && current->ModificationNumber == i)
+							{
+								key.Ligs.insert(key.Ligs.end(), current->wch[0]);
+								key.Ligs.insert(key.Ligs.end(), current->wch[1]);
+								break;
+							}
+							current = (PLIGATURE641)(((PBYTE)current) + KbdTables64->cbLgEntry);
 						}
-						current = (PLIGATURE641)(((PBYTE)current) + KbdTables64->cbLgEntry);
+
+						/*key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[0]);
+						key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[1]);*/
+
+						pVK->Characters.insert(pVK->Characters.end(), key);
 					}
+					else if (pVkToWch->wch[i] == WCH_DEAD)
+					{
+						//Is DeadKey
+						//Fetch Next key for character
+						PVK_TO_WCHARS641 pVkToWchNext = (PVK_TO_WCHARS641)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
+						VK_STRUCT_KEY key;
+						key.Character = pVkToWchNext->wch[i];
+						key.IsLig = false;
+						key.IsDeadKey = true;
 
-					/*key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[0]);
-					key.Ligs.insert(key.Ligs.end(), KbdTables64->pLIGATURE64->wch[1]);*/
+						pVK->Characters.insert(pVK->Characters.end(), key);
+					}
+					else
+					{
+						VK_STRUCT_KEY key;
+						key.Character = pVkToWch->wch[i];
+						key.IsLig = false;
+						key.IsDeadKey = false;
 
-					pVK->Characters.insert(pVK->Characters.end(), key);
+						pVK->Characters.insert(pVK->Characters.end(), key);
+					}
 				}
-				else
-				{
-					VK_STRUCT_KEY key;
-					key.Character = pVkToWch->wch[i];
-					key.IsLig = false;
-
-					pVK->Characters.insert(pVK->Characters.end(), key);
-				}
+				m_vkarray.insert(m_vkarray.end(), pVK);
 			}
-			m_vkarray.insert(m_vkarray.end(), pVK);
-
 			pVkToWch = (PVK_TO_WCHARS641)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
 		}
 		++pVkToWchTbl;

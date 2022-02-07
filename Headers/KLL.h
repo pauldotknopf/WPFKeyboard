@@ -17,6 +17,7 @@ public:
 	struct VK_STRUCT_KEY
 	{
 		bool IsLig;
+		bool IsDeadKey;
 		int Character;
 		std::vector<int> Ligs;
 	};
