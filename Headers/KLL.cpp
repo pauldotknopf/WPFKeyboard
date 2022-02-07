@@ -139,40 +139,57 @@ void CKLL::Fill32()
 		PVK_TO_WCHARS1 pVkToWch = pVkToWchTbl->pVkToWchars;
 		while (pVkToWch->VirtualKey)
 		{
-			VK_STRUCT *pVK = new VK_STRUCT();
-			pVK->VirtualKey = (int)pVkToWch->VirtualKey;
-			pVK->Attributes = pVkToWch->Attributes;
-
-			for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
+			if (pVkToWch->VirtualKey != 0xFF)
 			{
-				if (pVkToWch->wch[i] == WCH_LGTR)
-				{
-					VK_STRUCT_KEY key;
-					key.Character = 0;
-					key.IsLig = true;
+				VK_STRUCT* pVK = new VK_STRUCT();
+				pVK->VirtualKey = (int)pVkToWch->VirtualKey;
+				pVK->Attributes = pVkToWch->Attributes;
 
-					PLIGATURE1 current = KbdTables->pLigature;
-					while (current)
+				for (int i = 0; i < pVkToWchTbl->nModifications; ++i)
+				{
+					if (pVkToWch->wch[i] == WCH_LGTR)
 					{
-						if (current->VirtualKey == pVK->VirtualKey)
+						VK_STRUCT_KEY key;
+						key.Character = 0;
+						key.IsLig = true;
+						key.IsDeadKey = false;
+
+						PLIGATURE1 current = KbdTables->pLigature;
+						while (current)
 						{
-							key.Ligs.insert(key.Ligs.end(), current->wch[i]);
+							if (current->VirtualKey == pVK->VirtualKey)
+							{
+								key.Ligs.insert(key.Ligs.end(), current->wch[i]);
+							}
+							current = (PLIGATURE1)(((PBYTE)current) + KbdTables64->cbLgEntry);
 						}
-						current = (PLIGATURE1)(((PBYTE)current) + KbdTables64->cbLgEntry);
+
+						pVK->Characters.insert(pVK->Characters.end(), key);
 					}
+					else if (pVkToWch->wch[i] == WCH_DEAD)
+					{
+						//Is DeadKey
+						//Fetch Next key for character
+						PVK_TO_WCHARS1 pVkToWchNext = (PVK_TO_WCHARS1)(((PBYTE)pVkToWch) + pVkToWchTbl->cbSize);
+						VK_STRUCT_KEY key;
+						key.Character = pVkToWchNext->wch[i];
+						key.IsLig = false;
+						key.IsDeadKey = true;
 
-					pVK->Characters.insert(pVK->Characters.end(), key);
-				}
-				else
-				{
-					VK_STRUCT_KEY key;
-					key.Character = pVkToWch->wch[i];
-					key.IsLig = false;
+						pVK->Characters.insert(pVK->Characters.end(), key);
+					}
+					else
+					{
+						VK_STRUCT_KEY key;
+						key.Character = pVkToWch->wch[i];
+						key.IsLig = false;
+						key.IsDeadKey = false;
 
-					pVK->Characters.insert(pVK->Characters.end(), key);
+						pVK->Characters.insert(pVK->Characters.end(), key);
+					}
 				}
+				m_vkarray.insert(m_vkarray.end(), pVK);
 			}
-			m_vkarray.insert(m_vkarray.end(), pVK);
 		}
 		++pVkToWchTbl;
 	}
