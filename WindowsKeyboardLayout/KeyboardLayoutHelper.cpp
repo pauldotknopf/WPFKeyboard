@@ -46,7 +46,7 @@ WPFKeyboardNative::KeyboardLayout^ WPFKeyboardNative::KeyboardLayoutHelper::GetL
 				{
 					ligs[z] = vk->Characters[y].Ligs.at(z);
 				}
-				characters[y] = gcnew VirtualKeyCharacter(vk->Characters[y].IsLig, vk->Characters[y].Character, ligs);
+				characters[y] = gcnew VirtualKeyCharacter(vk->Characters[y].IsLig, vk->Characters[y].IsDeadKey, vk->Characters[y].Character, ligs);
 			}
 
 			layout->VirtualKeys->Add(gcnew VirtualKey(vk->VirtualKey, vk->Attributes, characters));

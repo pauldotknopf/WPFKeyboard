@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "VirtualKey.h"
 
-WPFKeyboardNative::VirtualKeyCharacter::VirtualKeyCharacter(bool isLig, int character, array<int>^ ligs)
+WPFKeyboardNative::VirtualKeyCharacter::VirtualKeyCharacter(bool isLig, bool isDeadKey, int character, array<int>^ ligs)
 {
 	_isLig = isLig;
+	_isDeadKey = isDeadKey;
 	_character = character;
 	_ligs = ligs;
 }
@@ -11,6 +12,11 @@ WPFKeyboardNative::VirtualKeyCharacter::VirtualKeyCharacter(bool isLig, int char
 bool WPFKeyboardNative::VirtualKeyCharacter::IsLig::get()
 {
 	return _isLig;
+}
+
+bool WPFKeyboardNative::VirtualKeyCharacter::IsDeadKey::get()
+{
+	return _isDeadKey;
 }
 
 int WPFKeyboardNative::VirtualKeyCharacter::Character::get()
